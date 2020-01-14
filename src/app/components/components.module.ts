@@ -12,6 +12,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {NavbarComponent} from './navbar/navbar.component';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {RouterModule} from '@angular/router';
+import {MatIconModule} from '@angular/material/icon';
 
 
 @NgModule({
@@ -30,7 +31,8 @@ import {RouterModule} from '@angular/router';
     ReactiveFormsModule,
     MatAutocompleteModule,
     MatToolbarModule,
-    RouterModule
+    RouterModule,
+    MatIconModule
   ],
   exports: [
     GameVersionsSelectorComponent,
