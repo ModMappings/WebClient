@@ -2,17 +2,25 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {GameVersionsSelectorComponent} from './game-versions-selector/game-versions-selector.component';
 import {MatButtonModule} from '@angular/material/button';
-import { ThemeSelectorComponent } from './theme-selector/theme-selector.component';
+import {ThemeSelectorComponent} from './theme-selector/theme-selector.component';
 import {MatSelectModule} from '@angular/material/select';
 import {MatMenuModule} from '@angular/material/menu';
-import { GlobalSearchBoxComponent } from './global-search-box/global-search-box.component';
+import {GlobalSearchBoxComponent} from './global-search-box/global-search-box.component';
 import {MatInputModule} from '@angular/material/input';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {NavbarComponent} from './navbar/navbar.component';
+import {MatToolbarModule} from '@angular/material/toolbar';
+import {RouterModule} from '@angular/router';
 
 
 @NgModule({
-  declarations: [GameVersionsSelectorComponent, ThemeSelectorComponent, GlobalSearchBoxComponent],
+  declarations: [
+    GameVersionsSelectorComponent,
+    ThemeSelectorComponent,
+    GlobalSearchBoxComponent,
+    NavbarComponent
+  ],
   imports: [
     CommonModule,
     MatButtonModule,
@@ -20,12 +28,16 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
     MatMenuModule,
     MatInputModule,
     ReactiveFormsModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatToolbarModule,
+    RouterModule
   ],
   exports: [
     GameVersionsSelectorComponent,
     ThemeSelectorComponent,
-    GlobalSearchBoxComponent
+    GlobalSearchBoxComponent,
+    NavbarComponent
   ]
 })
-export class ComponentsModule { }
+export class ComponentsModule {
+}
