@@ -1,1 +1,11 @@
-<p>search-page works!</p>
+<div>
+  <app-global-search-box></app-global-search-box>
+
+  <div *ngIf="searchValue != null">
+    <h3>Results for:</h3>
+    <p>{{searchValue}}</p>
+  </div>
+  <div *ngIf="searchValue == null">
+    Type something to search.
+  </div>
+</div>
