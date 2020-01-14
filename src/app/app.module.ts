@@ -9,6 +9,11 @@ import {HomeModule} from './pages/home/home.module';
 import {SearchModule} from './pages/search/search.module';
 import {GameVersionsService} from './services/game-versions.service';
 import {ComponentsModule} from './components/components.module';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {ThemeService} from './services/theme.service';
+import {MatMenuModule} from "@angular/material/menu";
+import {MatToolbarModule} from "@angular/material/toolbar";
+import {MatButtonModule} from "@angular/material/button";
 
 @NgModule({
   declarations: [
@@ -21,10 +26,15 @@ import {ComponentsModule} from './components/components.module';
     NgbModule,
     ComponentsModule,
     HomeModule,
-    SearchModule
+    SearchModule,
+    BrowserAnimationsModule,
+    MatMenuModule,
+    MatToolbarModule,
+    MatButtonModule
   ],
   providers: [
-    GameVersionsService
+    GameVersionsService,
+    ThemeService
   ],
   bootstrap: [AppComponent]
 })
