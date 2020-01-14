@@ -1,39 +1,43 @@
-/* You can add global styles to this file, and also import other style files */
-@import "~bootstrap/dist/css/bootstrap.min.css";
-
- //angular material theming
+//angular material theming
 @import "~@angular/material/theming";
 
 @include mat-core();
 
 // define a light theme
 $app-primary: mat-palette($mat-indigo);
-$app-accent:  mat-palette($mat-pink, A200, A100, A400);
-$app-theme:   mat-light-theme($app-primary, $app-accent);
+$app-accent: mat-palette($mat-pink, A200, A100, A400);
+$app-theme: mat-light-theme($app-primary, $app-accent);
 
 // define dark theme
 $dark-primary: mat-palette($mat-blue-grey);
-$dark-accent:  mat-palette($mat-amber, A200, A100, A400);
-$dark-warn:    mat-palette($mat-deep-orange);
-$dark-theme:   mat-dark-theme($dark-primary, $dark-accent, $dark-warn);
+$dark-accent: mat-palette($mat-amber, A200, A100, A400);
+$dark-warn: mat-palette($mat-deep-orange);
+$dark-theme: mat-dark-theme($dark-primary, $dark-accent, $dark-warn);
 
 @mixin app-main-theme($theme) {
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
 
   body {
-    background: map-get($background, background);
-    color: map-get($foreground, text);
+    background: mat-color($background, background);
+    color: mat-color($foreground, text);
   }
 }
 
+// apply all the theming mixins
 @include angular-material-theme($app-theme);
 @include app-main-theme($app-theme);
 
 .app-dark-theme {
   @include angular-material-theme($dark-theme);
-  @include app-main-theme($dark-theme)
+  @include app-main-theme($dark-theme);
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}

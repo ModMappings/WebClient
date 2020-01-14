@@ -2,16 +2,22 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {GameVersionsSelectorComponent} from './game-versions-selector/game-versions-selector.component';
 import {MatButtonModule} from '@angular/material/button';
+import { ThemeSelectorComponent } from './theme-selector/theme-selector.component';
+import {MatSelectModule} from "@angular/material/select";
+import {MatMenuModule} from "@angular/material/menu";
 
 
 @NgModule({
-  declarations: [GameVersionsSelectorComponent],
+  declarations: [GameVersionsSelectorComponent, ThemeSelectorComponent],
   imports: [
     CommonModule,
-    MatButtonModule
+    MatButtonModule,
+    MatSelectModule,
+    MatMenuModule
   ],
   exports: [
-    GameVersionsSelectorComponent
+    GameVersionsSelectorComponent,
+    ThemeSelectorComponent
   ]
 })
 export class ComponentsModule { }
