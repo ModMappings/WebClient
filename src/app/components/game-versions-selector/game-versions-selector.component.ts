@@ -12,7 +12,7 @@ import {GameVersion} from '../../services/game-version';
 export class GameVersionsSelectorComponent implements OnInit, OnDestroy {
 
   private readonly destroyed$ = new Subject();
-  private versions: GameVersion[] | null = null;
+  versions: GameVersion[] | null = null;
 
   constructor(private readonly gameVersionsService: GameVersionsService) {
   }

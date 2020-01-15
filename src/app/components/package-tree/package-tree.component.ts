@@ -24,12 +24,12 @@ export class PackageTreeComponent implements OnInit {
   constructor() {
     const packages = makeHierarchical(
       [
-        'net.minecraft.world.biome',
-        'net.minecraft.particles',
-        'net.minecraft.pathfinding',
-        'net.minecraft.world.something',
-        'com.mojang.foobarbaz'
-      ]
+        'foo',
+        'foo.bar',
+        'bar',
+        'foo.bar.quuz',
+        'foo.bar.quak'
+      ].sort()
     );
     const flattened = flatten(packages);
     if (flattened.name === '') {

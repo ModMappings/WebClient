@@ -1,5 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {AppTheme, ThemeService} from "./services/theme.service";
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {AppTheme, ThemeService} from './services/theme.service';
+import {NavigationEnd, NavigationStart, Router} from '@angular/router';
+import {Subject} from 'rxjs';
+import {debounceTime, switchMap, takeUntil} from 'rxjs/operators';
 
 const themeToClassMap: Record<AppTheme, string | null> = {
   light: null,
@@ -11,13 +14,14 @@ const themeToClassMap: Record<AppTheme, string | null> = {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
 
-  title = 'MCMS';
+  private destroyed$ = new Subject();
+  routeLoading = false;
 
   private currentTheme: AppTheme | null = null;
 
-  constructor(private readonly themeService: ThemeService) {
+  constructor(private readonly themeService: ThemeService, private router: Router) {
   }
 
   private static unapplyTheme(theme: AppTheme) {
@@ -35,13 +39,34 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.themeService.theme.subscribe(nextTheme => {
+    this.themeService.theme.pipe(
+      takeUntil(this.destroyed$)
+    ).subscribe(nextTheme => {
       if (this.currentTheme != null) {
         AppComponent.unapplyTheme(this.currentTheme);
       }
       this.currentTheme = nextTheme;
       AppComponent.applyTheme(nextTheme);
     });
+
+    this.router.events.pipe(
+      switchMap(evt => {
+        if (evt instanceof NavigationStart) {
+          return [true];
+        } else if (evt instanceof NavigationEnd) {
+          return [false];
+        } else {
+          return [];
+        }
+      }),
+      debounceTime(20),
+      takeUntil(this.destroyed$)
+    ).subscribe(loading => this.routeLoading = loading);
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
   setTheme(theme: AppTheme) {

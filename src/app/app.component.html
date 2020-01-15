@@ -1,4 +1,8 @@
-<div class="app-container">
+<div class="app-container" [class.loading]="routeLoading">
   <app-navbar></app-navbar>
-  <router-outlet></router-outlet>
+  <mat-progress-bar mode="indeterminate" color="primary" class="loading-indicator">
+  </mat-progress-bar>
+  <div class="route-container">
+    <router-outlet></router-outlet>
+  </div>
 </div>

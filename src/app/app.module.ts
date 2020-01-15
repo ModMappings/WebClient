@@ -4,12 +4,11 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {HomeModule} from './pages/home/home.module';
-import {SearchModule} from './pages/search/search.module';
 import {GameVersionsService} from './services/game-versions.service';
 import {ComponentsModule} from './components/components.module';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ThemeService} from './services/theme.service';
-import {BrowseModule} from './pages/browse/browse.module';
+import {MatProgressBarModule, MatProgressSpinnerModule} from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -23,8 +22,8 @@ import {BrowseModule} from './pages/browse/browse.module';
     BrowserAnimationsModule,
 
     HomeModule,
-    SearchModule,
-    BrowseModule
+    MatProgressSpinnerModule,
+    MatProgressBarModule
   ],
   providers: [
     GameVersionsService,

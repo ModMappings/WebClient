@@ -1,0 +1,5 @@
+.app-container {
+  &:not(.loading) .loading-indicator, &.loading .route-container {
+    display: none;
+  }
+}
