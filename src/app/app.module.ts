@@ -9,6 +9,7 @@ import {GameVersionsService} from './services/game-versions.service';
 import {ComponentsModule} from './components/components.module';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ThemeService} from './services/theme.service';
+import {BrowseModule} from './pages/browse/browse.module';
 
 @NgModule({
   declarations: [
@@ -19,9 +20,11 @@ import {ThemeService} from './services/theme.service';
     AppRoutingModule,
     NgbModule,
     ComponentsModule,
+    BrowserAnimationsModule,
+
     HomeModule,
     SearchModule,
-    BrowserAnimationsModule,
+    BrowseModule
   ],
   providers: [
     GameVersionsService,

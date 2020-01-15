@@ -13,6 +13,8 @@ import {NavbarComponent} from './navbar/navbar.component';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {RouterModule} from '@angular/router';
 import {MatIconModule} from '@angular/material/icon';
+import { PackageTreeComponent } from './package-tree/package-tree.component';
+import {MatTreeModule} from '@angular/material';
 
 
 @NgModule({
@@ -20,25 +22,28 @@ import {MatIconModule} from '@angular/material/icon';
     GameVersionsSelectorComponent,
     ThemeSelectorComponent,
     GlobalSearchBoxComponent,
-    NavbarComponent
+    NavbarComponent,
+    PackageTreeComponent
   ],
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatMenuModule,
-    MatInputModule,
-    ReactiveFormsModule,
-    MatAutocompleteModule,
-    MatToolbarModule,
-    RouterModule,
-    MatIconModule
-  ],
+    imports: [
+        CommonModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatMenuModule,
+        MatInputModule,
+        ReactiveFormsModule,
+        MatAutocompleteModule,
+        MatToolbarModule,
+        RouterModule,
+        MatIconModule,
+        MatTreeModule
+    ],
   exports: [
     GameVersionsSelectorComponent,
     ThemeSelectorComponent,
     GlobalSearchBoxComponent,
-    NavbarComponent
+    NavbarComponent,
+    PackageTreeComponent
   ]
 })
 export class ComponentsModule {
