@@ -1,12 +1,15 @@
 import {Injectable} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {GameVersion} from './game-version';
+// import {observableEventSource} from '../util/event-source-observable';
 
-function v(name: string, maintained: boolean = false): GameVersion {
-  return {
-    displayName: name,
-    maintained
-  };
+interface ApiGameVersion {
+  id: string;
+  createdBy: string;
+  createdOn: string;
+  name: string;
+  preRelease: boolean;
+  snapshot: boolean;
 }
 
 @Injectable({
@@ -15,7 +18,7 @@ function v(name: string, maintained: boolean = false): GameVersion {
 export class GameVersionsService {
 
   private readonly versions$: Observable<GameVersion[]> = of(
-    [v('1.12'), v('1.13'), v('1.14', true), v('1.15', true)]
+    // [v('1.12'), v('1.13'), v('1.14', true), v('1.15', true)]
   );
 
   constructor() {
@@ -23,5 +26,9 @@ export class GameVersionsService {
 
   get versions(): Observable<GameVersion[]> {
     return this.versions$;
+  }
+
+  private loadVersions() {
+    // return observableEventSource('http://localhost:8081')
   }
 }

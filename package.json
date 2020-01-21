@@ -22,7 +22,11 @@
     "@angular/platform-browser-dynamic": "~8.2.14",
     "@angular/router": "~8.2.14",
     "@ng-bootstrap/ng-bootstrap": "^5.1.4",
+    "@types/luxon": "^1.21.0",
+    "angular-auth-oidc-client": "^10.0.11",
     "bootstrap": "^4.4.1",
+    "event-source-polyfill": "^1.0.12",
+    "luxon": "^1.21.3",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
     "zone.js": "~0.9.1"

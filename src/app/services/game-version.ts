@@ -1,4 +1,10 @@
+import {DateTime} from 'luxon';
+
 export interface GameVersion {
-  displayName: string;
-  maintained: boolean;
+  id: string;
+  createdBy: string;
+  createdOn: DateTime;
+  name: string;
+  preRelease: boolean;
+  snapshot: boolean;
 }

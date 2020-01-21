@@ -3,6 +3,7 @@ import {AppTheme, ThemeService} from './services/theme.service';
 import {NavigationEnd, NavigationStart, Router} from '@angular/router';
 import {Subject} from 'rxjs';
 import {debounceTime, switchMap, takeUntil} from 'rxjs/operators';
+import {OidcSecurityService} from 'angular-auth-oidc-client';
 
 const themeToClassMap: Record<AppTheme, string | null> = {
   light: null,
@@ -16,12 +17,24 @@ const themeToClassMap: Record<AppTheme, string | null> = {
 })
 export class AppComponent implements OnInit, OnDestroy {
 
+  isAuthenticated: boolean;
+  userData: any;
+
   private destroyed$ = new Subject();
   routeLoading = false;
 
   private currentTheme: AppTheme | null = null;
 
-  constructor(private readonly themeService: ThemeService, private router: Router) {
+  constructor(
+    private readonly themeService: ThemeService,
+    private readonly router: Router,
+    private readonly oidcSecurityService: OidcSecurityService
+  ) {
+    if (oidcSecurityService.moduleSetup) {
+      this.doCallbackLogicIfRequired();
+    } else {
+      oidcSecurityService.onModuleSetup.subscribe(() => this.doCallbackLogicIfRequired());
+    }
   }
 
   private static unapplyTheme(theme: AppTheme) {
@@ -36,6 +49,12 @@ export class AppComponent implements OnInit, OnDestroy {
     if (className != null) {
       document.documentElement.classList.add(className);
     }
+  }
+
+  private doCallbackLogicIfRequired() {
+    console.log('callback logic?', window.location.toString());
+    // Will do a callback, if the url has a code and state parameter.
+    this.oidcSecurityService.authorizedCallbackWithCode(window.location.toString());
   }
 
   ngOnInit(): void {
@@ -62,6 +81,14 @@ export class AppComponent implements OnInit, OnDestroy {
       debounceTime(20),
       takeUntil(this.destroyed$)
     ).subscribe(loading => this.routeLoading = loading);
+
+    this.oidcSecurityService.getIsAuthorized().subscribe(auth => {
+      this.isAuthenticated = auth;
+    });
+
+    this.oidcSecurityService.getUserData().subscribe(userData => {
+      this.userData = userData;
+    });
   }
 
   ngOnDestroy(): void {
@@ -71,6 +98,14 @@ export class AppComponent implements OnInit, OnDestroy {
 
   setTheme(theme: AppTheme) {
     this.themeService.setTheme(theme);
+  }
+
+  login() {
+    this.oidcSecurityService.authorize();
+  }
+
+  logout() {
+    this.oidcSecurityService.logoff();
   }
 
 }
