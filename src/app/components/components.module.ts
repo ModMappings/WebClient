@@ -13,8 +13,10 @@ import {NavbarComponent} from './navbar/navbar.component';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {RouterModule} from '@angular/router';
 import {MatIconModule} from '@angular/material/icon';
-import { PackageTreeComponent } from './package-tree/package-tree.component';
-import {MatTreeModule} from '@angular/material';
+import {PackageTreeComponent} from './package-tree/package-tree.component';
+import {MatCardModule, MatDialogModule, MatTreeModule} from '@angular/material';
+import {SignInButtonComponent} from './sign-in-button/sign-in-button.component';
+import {SignedInMenuComponent} from './signed-in-menu/signed-in-menu.component';
 
 
 @NgModule({
@@ -23,27 +25,34 @@ import {MatTreeModule} from '@angular/material';
     ThemeSelectorComponent,
     GlobalSearchBoxComponent,
     NavbarComponent,
-    PackageTreeComponent
+    PackageTreeComponent,
+    SignInButtonComponent,
+    SignedInMenuComponent
   ],
-    imports: [
-        CommonModule,
-        MatButtonModule,
-        MatSelectModule,
-        MatMenuModule,
-        MatInputModule,
-        ReactiveFormsModule,
-        MatAutocompleteModule,
-        MatToolbarModule,
-        RouterModule,
-        MatIconModule,
-        MatTreeModule
-    ],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatSelectModule,
+    MatMenuModule,
+    MatInputModule,
+    ReactiveFormsModule,
+    MatAutocompleteModule,
+    MatToolbarModule,
+    RouterModule,
+    MatIconModule,
+    MatTreeModule,
+    MatCardModule,
+    MatDialogModule
+  ],
   exports: [
     GameVersionsSelectorComponent,
     ThemeSelectorComponent,
     GlobalSearchBoxComponent,
     NavbarComponent,
     PackageTreeComponent
+  ],
+  entryComponents: [
+    SignedInMenuComponent,
   ]
 })
 export class ComponentsModule {

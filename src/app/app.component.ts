@@ -3,7 +3,7 @@ import {AppTheme, ThemeService} from './services/theme.service';
 import {NavigationEnd, NavigationStart, Router} from '@angular/router';
 import {Subject} from 'rxjs';
 import {debounceTime, switchMap, takeUntil} from 'rxjs/operators';
-import {OidcSecurityService} from 'angular-auth-oidc-client';
+import {OidcSecurityService, TokenHelperService} from 'angular-auth-oidc-client';
 
 const themeToClassMap: Record<AppTheme, string | null> = {
   light: null,
@@ -28,7 +28,8 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private readonly themeService: ThemeService,
     private readonly router: Router,
-    private readonly oidcSecurityService: OidcSecurityService
+    private readonly oidcSecurityService: OidcSecurityService,
+    private readonly tokenHelperService: TokenHelperService
   ) {
     if (oidcSecurityService.moduleSetup) {
       this.doCallbackLogicIfRequired();
@@ -84,10 +85,12 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.oidcSecurityService.getIsAuthorized().subscribe(auth => {
       this.isAuthenticated = auth;
-    });
-
-    this.oidcSecurityService.getUserData().subscribe(userData => {
-      this.userData = userData;
+      if (auth) {
+        const accessToken = this.oidcSecurityService.getToken();
+        this.userData = this.tokenHelperService.getPayloadFromToken(accessToken, false);
+      } else {
+        this.userData = {};
+      }
     });
   }
 

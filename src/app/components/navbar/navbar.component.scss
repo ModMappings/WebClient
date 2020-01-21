@@ -1,3 +1,18 @@
 .toolbar-middle {
   flex: 1 1 auto;
 }
+
+.signed-in-container {
+  position: relative;
+}
+
+app-signed-in-menu {
+  &.hidden {
+    display: none;
+  }
+
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 1rem;
+}

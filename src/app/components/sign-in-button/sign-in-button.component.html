@@ -1,0 +1,6 @@
+<ng-container *ngIf="userData == null; else: loggedIn">
+  <button mat-raised-button (click)="login()">Sign in</button>
+</ng-container>
+<ng-template #loggedIn>
+  <button mat-mini-fab color="primary" (click)="clickUserFab(); $event.stopPropagation()" class="logout-button">{{userInitials}}</button>
+</ng-template>
