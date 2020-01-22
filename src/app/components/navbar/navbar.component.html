@@ -9,5 +9,8 @@
   <span>
     <app-theme-selector></app-theme-selector>
     <app-sign-in-button (userFabClicked)="loggedInFabClicked()"></app-sign-in-button>
+    <ng-template #loggedInMenu>
+      <app-signed-in-menu (logoutClicked)="logoutClicked()" [username]="this.userData?.name"></app-signed-in-menu>
+    </ng-template>
   </span>
 </mat-toolbar>

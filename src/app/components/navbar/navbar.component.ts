@@ -1,9 +1,9 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {Subject} from 'rxjs';
 import {UserData} from '../../services/user-profile';
 import {ApiService} from '../../services/api.service';
 import {takeUntil} from 'rxjs/operators';
-import {MatDialog} from '@angular/material';
+import {MatDialog, MatDialogRef} from '@angular/material';
 import {SignedInMenuComponent} from '../signed-in-menu/signed-in-menu.component';
 import {SignInButtonComponent} from '../sign-in-button/sign-in-button.component';
 
@@ -23,6 +23,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   @ViewChild(SignInButtonComponent, {read: ElementRef, static: false})
   signInButtonRef: ElementRef;
 
+  @ViewChild('loggedInMenu', {static: false})
+  loggedInMenuRef: TemplateRef<any>;
+
+  private openSignInMenuDialog: MatDialogRef<any> | null = null;
+
   constructor(private apiService: ApiService, private readonly dialog: MatDialog) {
   }
 
@@ -39,28 +44,40 @@ export class NavbarComponent implements OnInit, OnDestroy {
     });
   }
 
+  private closeSignInDialog() {
+    if (this.openSignInMenuDialog != null) {
+      this.openSignInMenuDialog.close();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   loggedInFabClicked() {
-    const element = this.signInButtonRef.nativeElement as Element;
-    const rect = element.getBoundingClientRect();
-    console.log('rect', rect);
-    const dialogRef = this.dialog.open(SignedInMenuComponent, {
-      width: '250px',
-      hasBackdrop: false,
-      position: {
-        left: (rect.right - 250) + 'px',
-        top: (rect.top + 40) + 'px'
-      }
-    });
-    dialogRef.componentInstance.logoutClicked.pipe(
-      takeUntil(this.destroyed)
-    ).subscribe(() => this.logoutClicked());
+    if (!this.closeSignInDialog()) {
+      const element = this.signInButtonRef.nativeElement as Element;
+      const rect = element.getBoundingClientRect();
+      this.openSignInMenuDialog = this.dialog.open(this.loggedInMenuRef, {
+        hasBackdrop: true,
+        backdropClass: '__dummy__', // adding a dummy class here removes the default opacity effect
+        position: {
+          right: (document.documentElement.clientWidth - rect.right) + 'px',
+          top: (rect.top + 40) + 'px'
+        }
+      });
+      this.openSignInMenuDialog.beforeClosed().pipe(
+        takeUntil(this.destroyed)
+      ).subscribe(() => this.openSignInMenuDialog = null);
+    }
   }
 
   logoutClicked() {
+    this.closeSignInDialog();
     this.apiService.logout();
   }
 
   ngOnDestroy(): void {
+    this.closeSignInDialog();
     this.destroyed.next();
     this.destroyed.complete();
   }

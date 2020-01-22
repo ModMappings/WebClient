@@ -2,19 +2,6 @@
   <app-navbar></app-navbar>
   <mat-progress-bar mode="indeterminate" color="primary" class="loading-indicator">
   </mat-progress-bar>
-  <div>
-    <button *ngIf="!isAuthenticated" (click)="login()">Login</button>
-    <button *ngIf="isAuthenticated" (click)="logout()">Logout</button>
-
-    <hr />
-
-    Is Authenticated: {{ isAuthenticated }}
-
-    <br />
-    <br />
-
-    <code style="overflow: scroll; white-space: pre-wrap">{{ userData | json }}</code>
-  </div>
   <div class="route-container">
     <router-outlet></router-outlet>
   </div>
