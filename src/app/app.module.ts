@@ -10,10 +10,11 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ThemeService} from './services/theme.service';
 import {MatProgressBarModule, MatProgressSpinnerModule} from '@angular/material';
 import {HttpClientModule} from '@angular/common/http';
-import {AuthModule, AuthWellKnownEndpoints, OidcConfigService, OidcSecurityService, OpenIdConfiguration} from 'angular-auth-oidc-client';
+import {AuthModule, OidcConfigService, OidcSecurityService, OpenIdConfiguration} from 'angular-auth-oidc-client';
+import {environment} from '../environments/environment';
 
 export function loadOidcConfig(service: OidcConfigService) {
-  return () => service.load_using_stsServer('http://localhost:8081/auth/realms/ModMappings');
+  return () => service.load_using_stsServer(environment.openIdServer);
 }
 
 @NgModule({
@@ -56,14 +57,14 @@ export class AppModule {
     oidcConfigService.onConfigurationLoaded.subscribe(configResult => {
       const config: OpenIdConfiguration = {
         stsServer: configResult.customConfig.stsServer,
-        redirect_url: 'http://localhost:4200',
-        client_id: 'web_frontend',
+        redirect_url: `${environment.publicUrl}/`,
+        client_id: environment.openIdClientId,
         response_type: 'code',
         scope: 'openid',
-        post_logout_redirect_uri: 'http://localhost:4200/',
+        post_logout_redirect_uri: `${environment.publicUrl}/`,
         start_checksession: false,
         silent_renew: true,
-        silent_renew_url: 'http://localhost:4200/silent-renew.html',
+        silent_renew_url: `${environment.publicUrl}/silent-renew.html`,
         post_login_route: '/',
 
         forbidden_route: '/',
