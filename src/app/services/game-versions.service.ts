@@ -1,6 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Observable, of} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {GameVersion} from './game-version';
+import {ApiService} from './api.service';
+import {filter, first, mapTo, skipWhile} from 'rxjs/operators';
+
 // import {observableEventSource} from '../util/event-source-observable';
 
 interface ApiGameVersion {
@@ -17,18 +20,30 @@ interface ApiGameVersion {
 })
 export class GameVersionsService {
 
-  private readonly versions$: Observable<GameVersion[]> = of(
-    // [v('1.12'), v('1.13'), v('1.14', true), v('1.15', true)]
+  private readonly gameVersionsLoading$ = new BehaviorSubject<boolean>(false);
+  readonly versions$ = new BehaviorSubject<GameVersion[] | null>(null);
+  readonly versions: Observable<GameVersion[]> = this.versions$.pipe(
+    filter<GameVersion[]>(v => v != null)
   );
 
-  constructor() {
+  constructor(private api: ApiService) {
   }
 
-  get versions(): Observable<GameVersion[]> {
-    return this.versions$;
-  }
-
-  private loadVersions() {
-    // return observableEventSource('http://localhost:8081')
+  loadVersions(force: boolean = false): Observable<void> {
+    if ((force || this.versions$.getValue() == null) && !this.gameVersionsLoading$.getValue()) {
+      this.gameVersionsLoading$.next(true);
+      this.api.get<GameVersion[]>('/versions')
+        .subscribe({
+          next: versions => {
+            this.versions$.next(versions);
+          },
+          complete: () => this.gameVersionsLoading$.next(false)
+        });
+    }
+    return this.gameVersionsLoading$.pipe(
+      skipWhile(loading => loading),
+      first(),
+      mapTo(undefined)
+    );
   }
 }

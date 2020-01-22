@@ -18,6 +18,7 @@ export class GameVersionsSelectorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.gameVersionsService.loadVersions();
     this.gameVersionsService.versions.pipe(
       takeUntil(this.destroyed$)
     ).subscribe(versions => this.versions = versions);

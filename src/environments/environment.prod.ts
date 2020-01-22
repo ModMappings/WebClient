@@ -5,5 +5,6 @@ export const environment: Environment = {
   // TODO
   publicUrl: '',
   openIdClientId: '',
-  openIdServer: ''
+  openIdServer: '',
+  apiBaseUrl: ''
 };

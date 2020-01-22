@@ -3,4 +3,5 @@ export interface Environment {
   publicUrl: string;
   openIdServer: string;
   openIdClientId: string;
+  apiBaseUrl: string;
 }

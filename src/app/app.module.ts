@@ -9,9 +9,10 @@ import {ComponentsModule} from './components/components.module';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ThemeService} from './services/theme.service';
 import {MatProgressBarModule, MatProgressSpinnerModule} from '@angular/material';
-import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {AuthModule, OidcConfigService, OidcSecurityService, OpenIdConfiguration} from 'angular-auth-oidc-client';
 import {environment} from '../environments/environment';
+import {AddOidcTokenInterceptor} from './services/add-oidc-token.interceptor';
 
 export function loadOidcConfig(service: OidcConfigService) {
   return () => service.load_using_stsServer(environment.openIdServer);
@@ -46,8 +47,13 @@ export function loadOidcConfig(service: OidcConfigService) {
         useFactory: loadOidcConfig,
         deps: [OidcConfigService],
         multi: true
+      },
+      {
+        provide: HTTP_INTERCEPTORS,
+        useClass: AddOidcTokenInterceptor,
+        multi: true
       }
-    ]
+    ],
   ],
   bootstrap: [AppComponent]
 })

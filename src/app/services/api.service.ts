@@ -4,6 +4,7 @@ import {OidcSecurityService} from 'angular-auth-oidc-client';
 import {Observable} from 'rxjs';
 import {UserData} from './user-profile';
 import {map, shareReplay} from 'rxjs/operators';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +34,10 @@ export class ApiService {
 
   logout() {
     this.oidcSecurityService.logoff();
+  }
+
+  get<T>(url: string): Observable<T> {
+    return this.http.get<T>(`${environment.apiBaseUrl}${url}`);
   }
 
 }
