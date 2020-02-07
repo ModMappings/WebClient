@@ -897,6 +897,11 @@
     tree-kill "1.2.1"
     webpack-sources "1.4.3"
 
+"@openapitools/openapi-generator-cli@^1.0.10-4.2.3":
+  version "1.0.10-4.2.3"
+  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-1.0.10-4.2.3.tgz#4b934362efb9262fc236d4fb81b381e29bdb8245"
+  integrity sha512-Xo4rbz3aPiObpVS8oBUR0pHWYU5WBG/bmsJg16yCG7/vpGE8o1YsROTWMFfaMepWfxESrLP5XOqlBkZqbre7dw==
+
 "@schematics/angular@8.3.22":
   version "8.3.22"
   resolved "https://registry.yarnpkg.com/@schematics/angular/-/angular-8.3.22.tgz#fab009312bd3d50115332f2c41a92e15744ac09f"

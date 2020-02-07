@@ -38,7 +38,10 @@ export class GameVersionsService {
     filter<GameVersion[]>(v => v != null)
   );
 
-  constructor(private api: ApiService) {
+  constructor(
+    private api: ApiService,
+    // private gameVersionsService: GameVersionsService
+  ) {
   }
 
   loadVersions(force: boolean = false): Observable<void> {

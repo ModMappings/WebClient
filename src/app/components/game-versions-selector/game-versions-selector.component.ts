@@ -1,8 +1,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {GameVersionsService} from '../../services/game-versions.service';
 import {Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import {map, takeUntil} from 'rxjs/operators';
 import {GameVersion} from '../../services/game-version';
+// import {GameVersionsService} from '../../../generated';
 
 @Component({
   selector: 'app-game-versions-selector',
@@ -14,14 +14,16 @@ export class GameVersionsSelectorComponent implements OnInit, OnDestroy {
   private readonly destroyed$ = new Subject();
   versions: GameVersion[] | null = null;
 
-  constructor(private readonly gameVersionsService: GameVersionsService) {
+  constructor(/*private readonly gameVersionsService: GameVersionsService*/) {
   }
 
   ngOnInit() {
-    this.gameVersionsService.loadVersions();
-    this.gameVersionsService.versions.pipe(
-      takeUntil(this.destroyed$)
-    ).subscribe(versions => this.versions = versions);
+    // this.gameVersionsService.getGameVersionsBySearchCriteria().pipe(
+    //   map(versions => {
+    //     return versions.content?.map()
+    //   })
+    //   takeUntil(this.destroyed$)
+    // ).subscribe(versions => this.versions = versions);
   }
 
   ngOnDestroy(): void {

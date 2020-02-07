@@ -7,7 +7,8 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "generate-api": "openapi-generator generate -g typescript-angular -i http://localhost:8080/v3/api-docs/ -o src/generated --skip-validate-spec"
   },
   "private": true,
   "dependencies": {
@@ -36,6 +37,7 @@
     "@angular/cli": "~8.3.21",
     "@angular/compiler-cli": "~8.2.14",
     "@angular/language-service": "~8.2.14",
+    "@openapitools/openapi-generator-cli": "^1.0.10-4.2.3",
     "@types/jasmine": "~3.3.8",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
