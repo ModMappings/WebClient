@@ -20,10 +20,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
   signedIn = false;
   showSignedInMenu = false;
 
-  @ViewChild(SignInButtonComponent, {read: ElementRef, static: false})
+  @ViewChild(SignInButtonComponent, { read: ElementRef })
   signInButtonRef: ElementRef;
 
-  @ViewChild('loggedInMenu', {static: false})
+  @ViewChild('loggedInMenu')
   loggedInMenuRef: TemplateRef<any>;
 
   private openSignInMenuDialog: MatDialogRef<any> | null = null;
