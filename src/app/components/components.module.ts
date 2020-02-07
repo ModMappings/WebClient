@@ -14,7 +14,9 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import {RouterModule} from '@angular/router';
 import {MatIconModule} from '@angular/material/icon';
 import {PackageTreeComponent} from './package-tree/package-tree.component';
-import {MatCardModule, MatDialogModule, MatTreeModule} from '@angular/material';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatTreeModule } from '@angular/material/tree';
 import {SignInButtonComponent} from './sign-in-button/sign-in-button.component';
 import {SignedInMenuComponent} from './signed-in-menu/signed-in-menu.component';
 

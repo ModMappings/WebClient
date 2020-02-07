@@ -3,7 +3,7 @@ import {Subject} from 'rxjs';
 import {UserData} from '../../services/user-profile';
 import {ApiService} from '../../services/api.service';
 import {takeUntil} from 'rxjs/operators';
-import {MatDialog, MatDialogRef} from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import {SignedInMenuComponent} from '../signed-in-menu/signed-in-menu.component';
 import {SignInButtonComponent} from '../sign-in-button/sign-in-button.component';
 
