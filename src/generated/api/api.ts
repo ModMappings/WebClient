@@ -1,0 +1,13 @@
+export * from './gameVersions.service';
+import { GameVersionsService } from './gameVersions.service';
+export * from './mappables.service';
+import { MappablesService } from './mappables.service';
+export * from './mappingTypes.service';
+import { MappingTypesService } from './mappingTypes.service';
+export * from './mappings.service';
+import { MappingsService } from './mappings.service';
+export * from './releases.service';
+import { ReleasesService } from './releases.service';
+export * from './versionedMappables.service';
+import { VersionedMappablesService } from './versionedMappables.service';
+export const APIS = [GameVersionsService, MappablesService, MappingTypesService, MappingsService, ReleasesService, VersionedMappablesService];
