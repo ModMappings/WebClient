@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
-import {Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {UserData} from './user-profile';
 import {map, shareReplay} from 'rxjs/operators';
 import {environment} from '../../environments/environment';
@@ -11,6 +11,9 @@ import {environment} from '../../environments/environment';
 })
 export class ApiService {
 
+  private loginErrors$ = new Subject<string>();
+
+  loginErrors: Observable<string> = this.loginErrors$;
   userData: Observable<UserData | null>;
 
   constructor(private http: HttpClient, private oidcSecurityService: OidcSecurityService) {
@@ -29,7 +32,11 @@ export class ApiService {
   }
 
   login() {
-    this.oidcSecurityService.authorize();
+    if (!this.oidcSecurityService.moduleSetup) {
+      this.loginErrors$.next('Login Service seems to be down. Please try again later.');
+    } else {
+      this.oidcSecurityService.authorize();
+    }
   }
 
   logout() {

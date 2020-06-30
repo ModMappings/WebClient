@@ -4,6 +4,7 @@ import {NavigationEnd, NavigationStart, Router} from '@angular/router';
 import {Subject} from 'rxjs';
 import {debounceTime, switchMap, takeUntil} from 'rxjs/operators';
 import {OidcSecurityService, TokenHelperService} from 'angular-auth-oidc-client';
+import {ApiService} from './services/api.service';
 
 const themeToClassMap: Record<AppTheme, string | null> = {
   light: null,
@@ -29,7 +30,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private readonly themeService: ThemeService,
     private readonly router: Router,
     private readonly oidcSecurityService: OidcSecurityService,
-    private readonly tokenHelperService: TokenHelperService
+    private readonly tokenHelperService: TokenHelperService,
+    private readonly apiService: ApiService
   ) {
     if (oidcSecurityService.moduleSetup) {
       this.doCallbackLogicIfRequired();
@@ -91,6 +93,13 @@ export class AppComponent implements OnInit, OnDestroy {
       } else {
         this.userData = {};
       }
+    });
+
+
+    this.apiService.loginErrors.pipe(
+      takeUntil(this.destroyed$)
+    ).subscribe(error => {
+      alert('Login error!\n' + error);
     });
   }
 
