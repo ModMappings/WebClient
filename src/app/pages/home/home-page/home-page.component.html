@@ -9,9 +9,7 @@
       <ul *ngIf="!classesLoading">
         <li *ngFor="let cls of classes">{{ cls }}</li>
       </ul>
-      <div *ngIf="classesLoading">
-        <mat-icon>hourglass_bottom</mat-icon>
-      </div>
+      <app-loading-spinner *ngIf="classesLoading"></app-loading-spinner>
     </div>
   </div>
 </div>

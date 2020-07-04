@@ -19,6 +19,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatTreeModule } from '@angular/material/tree';
 import {SignInButtonComponent} from './sign-in-button/sign-in-button.component';
 import {SignedInMenuComponent} from './signed-in-menu/signed-in-menu.component';
+import { LoadingSpinnerComponent } from './loading-spinner/loading-spinner.component';
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import {SignedInMenuComponent} from './signed-in-menu/signed-in-menu.component';
     NavbarComponent,
     PackageTreeComponent,
     SignInButtonComponent,
-    SignedInMenuComponent
+    SignedInMenuComponent,
+    LoadingSpinnerComponent
   ],
   imports: [
     CommonModule,
@@ -51,7 +53,8 @@ import {SignedInMenuComponent} from './signed-in-menu/signed-in-menu.component';
     ThemeSelectorComponent,
     GlobalSearchBoxComponent,
     NavbarComponent,
-    PackageTreeComponent
+    PackageTreeComponent,
+    LoadingSpinnerComponent
   ],
   entryComponents: [
     SignedInMenuComponent,
