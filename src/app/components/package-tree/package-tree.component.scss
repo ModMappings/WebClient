@@ -10,8 +10,15 @@
   margin-left: 1rem;
 }
 
+.mat-icon-button mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+}
+
 button[mat-icon-button] {
-  //height: 24px;
-  //width: 24px;
-  //line-height: 24px;
+  height: 24px;
+  width: 24px;
+  line-height: 24px;
 }

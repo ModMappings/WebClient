@@ -81,18 +81,6 @@ export class PackageTree {
           }
         }
       }
-      // node.children = node.children.map(child => {
-      //   if (child.children.length === 1) {
-      //     const onlyChild = child.children[0];
-      //     return {
-      //       name: child.name + '/' + onlyChild.simpleName,
-      //       simpleName: child.simpleName + '/' + onlyChild.simpleName,
-      //       children: onlyChild.children
-      //     };
-      //   } else {
-      //     return child;
-      //   }
-      // });
     }
 
     this.root = rootNode;
