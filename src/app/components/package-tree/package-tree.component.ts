@@ -1,7 +1,9 @@
-import {Component, OnInit} from '@angular/core';
-import {NestedTreeControl} from '@angular/cdk/tree';
-import { MatTreeNestedDataSource } from '@angular/material/tree';
-import {flatten, makeHierarchical, PackageNode} from '../../util/package-tree';
+import {Component, Input, OnInit} from '@angular/core';
+import {NestedTreeControl, TreeControl} from '@angular/cdk/tree';
+import {MatTreeNestedDataSource} from '@angular/material/tree';
+import {PackageNode, PackageTree} from '../../util/package-tree';
+import {map} from 'rxjs/operators';
+import {Observable} from 'rxjs';
 
 interface Node {
   name: string;
@@ -16,38 +18,48 @@ interface Node {
 })
 export class PackageTreeComponent implements OnInit {
 
+  @Input()
+  tree: PackageTree;
+
   private readonly treeData: PackageNode[];
 
-  treeControl = new NestedTreeControl<PackageNode>(node => node.children == null ? null : [...node.children.values()]);
+  treeControl: NestedTreeControl<PackageNode>;
   dataSource = new MatTreeNestedDataSource<PackageNode>();
 
+  hasChild = (_: number, node: PackageNode) => {
+    return node.hasChildren;
+  }
+
   constructor() {
-    const packages = makeHierarchical(
-      [
-        'foo',
-        'foo.bar',
-        'bar',
-        'foo.bar.quuz',
-        'foo.bar.quak'
-      ].sort()
-    );
-    const flattened = flatten(packages);
-    if (flattened.name === '') {
-      this.treeData = flattened.children == null ? [] : [...flattened.children.values()];
-    } else {
-      this.treeData = [flattened];
-    }
-    this.dataSource.data = this.treeData;
+
   }
 
   ngOnInit() {
+    this.treeControl = new NestedTreeControl<PackageNode>(node => {
+      return this.tree.getImmediateChildrenIfLoaded(node.name);
+    });
+    this.tree.getImmediateChildren(this.tree.rootNode.name).subscribe(children => {
+      this.dataSource.data = children;
+    });
   }
 
-  hasChild(_: number, node: PackageNode) {
-    return node.children != null && node.children.size > 0;
+  loadChildren(node: PackageNode) {
+    this.tree.loadChildren(node.name).subscribe(() => {
+      this.dataSource.data = [];
+      this.dataSource.data = this.tree.getImmediateChildrenIfLoaded(this.tree.rootNode.name) || [];
+    });
   }
 
   icon(node: PackageNode): string {
-    return /*node.type === 'class' ? 'code' : */this.treeControl.isExpanded(node) ? 'folder_open' : 'folder';
+    if (!node.hasChildren) {
+      return 'folder';
+    } else if (this.treeControl.isExpanded(node)) {
+      if (this.tree.isLoadingChildren(node.name)) {
+        return 'hourglass_bottom';
+      } else {
+        return 'folder_open';
+      }
+    }
+    return /*node.type === 'class' ? 'code' : */node.hasChildren && this.treeControl.isExpanded(node) ? 'folder_open' : 'folder';
   }
 }

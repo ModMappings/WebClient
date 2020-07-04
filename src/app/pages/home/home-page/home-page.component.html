@@ -1,4 +1,6 @@
-<div class="home-container">
+<div class="home-container" style="display: block; margin-left: 30px">
   <app-global-search-box></app-global-search-box>
-  <app-game-versions-selector></app-game-versions-selector>
+  <app-game-versions-selector (selectGameVersion)="selectGameVersion($event)">
+  </app-game-versions-selector>
+  <app-package-tree [tree]="packageTree" *ngIf="packageTree != null"></app-package-tree>
 </div>

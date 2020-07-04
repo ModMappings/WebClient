@@ -135,6 +135,9 @@ export class VersionedMappablesService {
      * @param classId The id of the class to find versioned mappables in. Null to ignore.
      * @param methodId The id of the method to find versioned mappables in. Null to ignore.
      * @param mappingId The id of the mapping to find the versioned mappables for. Null to ignore. If parameter is passed, either a single result is returned or none. Since each mapping can only target a single versioned mappable.
+     * @param mappingTypeId The id of the mapping type to find the versioned mappables for. Null to ignore. Use full in combination with a input and output regex.
+     * @param mappingInputRegex A regex that is mapped against the input of the mapping. Null to ignore
+     * @param mappingOutputRegex A regex that is mapped against the output of the mapping. Null to ignore
      * @param superTypeTargetId The id of the class to find the super types for. Null to ignore.
      * @param subTypeTargetId The id of the class to find the sub types for. Null to ignore.
      * @param page Zero-based page index (0..N)
@@ -143,10 +146,10 @@ export class VersionedMappablesService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getVersionedMappablesBySearchCriteria(gameVersionId?: string, mappableType?: MappableType, classId?: string, methodId?: string, mappingId?: string, superTypeTargetId?: string, subTypeTargetId?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<PageVersionedMappable>;
-    public getVersionedMappablesBySearchCriteria(gameVersionId?: string, mappableType?: MappableType, classId?: string, methodId?: string, mappingId?: string, superTypeTargetId?: string, subTypeTargetId?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpResponse<PageVersionedMappable>>;
-    public getVersionedMappablesBySearchCriteria(gameVersionId?: string, mappableType?: MappableType, classId?: string, methodId?: string, mappingId?: string, superTypeTargetId?: string, subTypeTargetId?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpEvent<PageVersionedMappable>>;
-    public getVersionedMappablesBySearchCriteria(gameVersionId?: string, mappableType?: MappableType, classId?: string, methodId?: string, mappingId?: string, superTypeTargetId?: string, subTypeTargetId?: string, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<any> {
+    public getVersionedMappablesBySearchCriteria(gameVersionId?: string, mappableType?: MappableType, classId?: string, methodId?: string, mappingId?: string, mappingTypeId?: string, mappingInputRegex?: string, mappingOutputRegex?: string, superTypeTargetId?: string, subTypeTargetId?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<PageVersionedMappable>;
+    public getVersionedMappablesBySearchCriteria(gameVersionId?: string, mappableType?: MappableType, classId?: string, methodId?: string, mappingId?: string, mappingTypeId?: string, mappingInputRegex?: string, mappingOutputRegex?: string, superTypeTargetId?: string, subTypeTargetId?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpResponse<PageVersionedMappable>>;
+    public getVersionedMappablesBySearchCriteria(gameVersionId?: string, mappableType?: MappableType, classId?: string, methodId?: string, mappingId?: string, mappingTypeId?: string, mappingInputRegex?: string, mappingOutputRegex?: string, superTypeTargetId?: string, subTypeTargetId?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpEvent<PageVersionedMappable>>;
+    public getVersionedMappablesBySearchCriteria(gameVersionId?: string, mappableType?: MappableType, classId?: string, methodId?: string, mappingId?: string, mappingTypeId?: string, mappingInputRegex?: string, mappingOutputRegex?: string, superTypeTargetId?: string, subTypeTargetId?: string, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<any> {
 
         let queryParameters = new HttpParams({encoder: this.encoder});
         if (gameVersionId !== undefined && gameVersionId !== null) {
@@ -168,6 +171,18 @@ export class VersionedMappablesService {
         if (mappingId !== undefined && mappingId !== null) {
           queryParameters = this.addToHttpParams(queryParameters,
             <any>mappingId, 'mappingId');
+        }
+        if (mappingTypeId !== undefined && mappingTypeId !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>mappingTypeId, 'mappingTypeId');
+        }
+        if (mappingInputRegex !== undefined && mappingInputRegex !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>mappingInputRegex, 'mappingInputRegex');
+        }
+        if (mappingOutputRegex !== undefined && mappingOutputRegex !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>mappingOutputRegex, 'mappingOutputRegex');
         }
         if (superTypeTargetId !== undefined && superTypeTargetId !== null) {
           queryParameters = this.addToHttpParams(queryParameters,

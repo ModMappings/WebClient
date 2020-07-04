@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
 import {Subject} from 'rxjs';
 import {map, takeUntil} from 'rxjs/operators';
 import {GameVersion} from '../../services/game-version';
@@ -14,6 +14,9 @@ export class GameVersionsSelectorComponent implements OnInit, OnDestroy {
 
   private readonly destroyed$ = new Subject();
   versions: GameVersion[] | null = null;
+
+  @Output()
+  selectGameVersion = new EventEmitter<GameVersion>();
 
   constructor(private readonly gameVersionsService: GameVersionsService) {
   }

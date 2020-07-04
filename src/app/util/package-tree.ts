@@ -1,52 +1,81 @@
+import {Observable, of} from 'rxjs';
+import {first, map, mapTo, shareReplay} from 'rxjs/operators';
+import {LoadedPackage} from '../services/package.service';
+
 export interface PackageNode {
   name: string;
-  children?: Map<string, PackageNode>;
+  simpleName: string;
+  hasChildren: boolean;
 }
 
-export function makeHierarchical(packages: string[]): PackageNode {
-  const rootNode: PackageNode = {
+export type PackageLoader = (parentPackage: string) => Observable<LoadedPackage[]>;
+
+export class PackageTree {
+
+  readonly rootNode: PackageNode = {
     name: '',
-    children: new Map()
+    simpleName: '',
+    hasChildren: true
   };
 
-  for (const pkg of packages) {
-    let node: PackageNode = rootNode;
-    for (const part of pkg.split('.')) {
-      if (node.children == null) {
-        node.children = new Map();
-      }
-      let nextNode = node.children.get(part);
-      if (nextNode == null) {
-        node.children.set(part, (nextNode = {name: part}));
-      }
-      node = nextNode;
-    }
+  private readonly loader: PackageLoader;
+  private loadingMap = new Map<string, Observable<PackageNode[]>>();
+  private childMap = new Map<string, PackageNode[]>();
+
+  constructor(loader: PackageLoader) {
+    this.loader = loader;
   }
-  return rootNode;
+
+  isLoadingChildren(name: string): boolean {
+    return this.loadingMap.has(name);
+  }
+
+  getImmediateChildrenIfLoaded(name: string): PackageNode[] | null {
+    const children = this.childMap.get(name);
+    return children == null ? null : children;
+  }
+
+  loadChildren(name: string): Observable<void> {
+    return this.getImmediateChildren(name).pipe(mapTo(undefined));
+  }
+
+  getImmediateChildren(name: string): Observable<PackageNode[]> {
+    const loading = this.loadingMap.get(name);
+    if (loading != null) {
+      return loading;
+    }
+    const children = this.childMap.get(name);
+    if (children != null) {
+      return of(children);
+    }
+
+    const loader = this.loader(name).pipe(
+      first(),
+      map(rawChildren => {
+        return rawChildren.map(pkg => parsePackage(pkg));
+      }),
+      shareReplay(1)
+    );
+
+    this.loadingMap.set(name, loader);
+    loader.subscribe({
+      next: c => this.childMap.set(name, c),
+      complete: () => {
+        this.loadingMap.delete(name);
+      }
+    });
+
+    loader.subscribe();
+
+    return loader;
+  }
 }
 
-export function flatten(node: PackageNode): PackageNode {
-  let name = '';
-  let current = node;
-  while (true) {
-    name += name.length > 0 ? '.' + current.name : current.name;
-    if (current.children == null || current.children.size === 0) {
-      return {
-        name
-      };
-    } else if (current.children.size > 1) {
-      return {
-        name,
-        children: new Map(
-          [...current.children.values()]
-            .map(child => {
-              const flat = flatten(child);
-              return [flat.name, flat];
-            })
-        )
-      };
-    } else {
-      current = current.children[Symbol.iterator]().next().value[1];
-    }
-  }
+function parsePackage(pkg: LoadedPackage): PackageNode {
+  const match = pkg.name.match(/\.([^.]+)$/);
+  return {
+    name: pkg.name,
+    simpleName: match == null ? pkg.name : match[1],
+    hasChildren: pkg.hasChildren
+  };
 }

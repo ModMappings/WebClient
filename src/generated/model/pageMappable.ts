@@ -18,8 +18,8 @@ export interface PageMappable {
     totalElements?: number;
     totalPages?: number;
     first?: boolean;
-    number?: number;
     sort?: Sort;
+    number?: number;
     numberOfElements?: number;
     pageable?: Pageable;
     last?: boolean;

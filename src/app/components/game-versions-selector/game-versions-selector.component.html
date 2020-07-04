@@ -1,7 +1,8 @@
 <div>
   <div class="title">Game Versions</div>
   <div class="versions">
-    <button *ngFor="let version of versions" type="button" mat-raised-button [color]="version.snapshot || version.preRelease ? 'warn' : 'primary'">
+    <button *ngFor="let version of versions" type="button" mat-raised-button [color]="version.snapshot || version.preRelease ? 'warn' : 'primary'"
+            (click)="selectGameVersion.emit(version)">
       {{version.name}}
     </button>
   </div>
