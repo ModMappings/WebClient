@@ -4,3 +4,9 @@
 
   }
 }
+
+.wrapper {
+  display: grid;
+  grid-template-columns: 300px auto;
+  grid-column-gap: 20px;
+}

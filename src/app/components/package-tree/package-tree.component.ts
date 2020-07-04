@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {NestedTreeControl, TreeControl} from '@angular/cdk/tree';
 import {MatTree, MatTreeNestedDataSource} from '@angular/material/tree';
 import {PackageNode, PackageTree} from '../../util/package-tree';
@@ -21,7 +21,9 @@ export class PackageTreeComponent implements OnInit {
   @Input()
   tree: PackageTree;
 
-  private readonly treeData: PackageNode[];
+  @Output()
+  packageSelected = new EventEmitter<string>();
+
 
   treeControl: NestedTreeControl<PackageNode> = new NestedTreeControl<PackageNode>(node => {
     return node.children;

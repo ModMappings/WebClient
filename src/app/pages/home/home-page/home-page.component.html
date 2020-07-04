@@ -2,5 +2,16 @@
   <app-global-search-box></app-global-search-box>
   <app-game-versions-selector (selectGameVersion)="selectGameVersion($event)">
   </app-game-versions-selector>
-  <app-package-tree [tree]="packageTree" *ngIf="packageTree != null"></app-package-tree>
+  <div class="wrapper">
+    <app-package-tree [tree]="packageTree" *ngIf="packageTree != null" (packageSelected)="selectPackage($event)">
+    </app-package-tree>
+    <div class="class-list">
+      <ul *ngIf="!classesLoading">
+        <li *ngFor="let cls of classes">{{ cls }}</li>
+      </ul>
+      <div *ngIf="classesLoading">
+        <mat-icon>hourglass_bottom</mat-icon>
+      </div>
+    </div>
+  </div>
 </div>

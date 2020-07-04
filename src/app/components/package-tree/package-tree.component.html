@@ -4,7 +4,7 @@
 <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" *ngIf="treeControl && dataSource.data">
   <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
     <div class="mat-tree-node">
-      <button mat-icon-button disabled>
+      <button mat-icon-button (click)="packageSelected.next(node.name)">
         <mat-icon>{{icon(node)}}</mat-icon>
       </button>
       {{node.simpleName}}
@@ -12,7 +12,7 @@
   </mat-tree-node>
   <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
     <div class="mat-tree-node">
-      <button mat-icon-button matTreeNodeToggle>
+      <button mat-icon-button matTreeNodeToggle (click)="packageSelected.next(node.name)">
         <mat-icon class="mat-icon-rtl-mirror">
           {{icon(node)}}
         </mat-icon>
