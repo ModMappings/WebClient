@@ -1,6 +1,6 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {NestedTreeControl, TreeControl} from '@angular/cdk/tree';
-import {MatTreeNestedDataSource} from '@angular/material/tree';
+import {MatTree, MatTreeNestedDataSource} from '@angular/material/tree';
 import {PackageNode, PackageTree} from '../../util/package-tree';
 import {map} from 'rxjs/operators';
 import {Observable} from 'rxjs';
@@ -23,11 +23,16 @@ export class PackageTreeComponent implements OnInit {
 
   private readonly treeData: PackageNode[];
 
-  treeControl: NestedTreeControl<PackageNode>;
+  treeControl: NestedTreeControl<PackageNode> = new NestedTreeControl<PackageNode>(node => {
+    return node.children;
+  });
   dataSource = new MatTreeNestedDataSource<PackageNode>();
 
+  @ViewChild(MatTree)
+  matTree: MatTree<any>;
+
   hasChild = (_: number, node: PackageNode) => {
-    return node.hasChildren;
+    return node.children.length !== 0;
   }
 
   constructor() {
@@ -35,31 +40,10 @@ export class PackageTreeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.treeControl = new NestedTreeControl<PackageNode>(node => {
-      return this.tree.getImmediateChildrenIfLoaded(node.name);
-    });
-    this.tree.getImmediateChildren(this.tree.rootNode.name).subscribe(children => {
-      this.dataSource.data = children;
-    });
-  }
-
-  loadChildren(node: PackageNode) {
-    this.tree.loadChildren(node.name).subscribe(() => {
-      this.dataSource.data = [];
-      this.dataSource.data = this.tree.getImmediateChildrenIfLoaded(this.tree.rootNode.name) || [];
-    });
+    this.dataSource.data = this.tree.root.children;
   }
 
   icon(node: PackageNode): string {
-    if (!node.hasChildren) {
-      return 'folder';
-    } else if (this.treeControl.isExpanded(node)) {
-      if (this.tree.isLoadingChildren(node.name)) {
-        return 'hourglass_bottom';
-      } else {
-        return 'folder_open';
-      }
-    }
-    return /*node.type === 'class' ? 'code' : */node.hasChildren && this.treeControl.isExpanded(node) ? 'folder_open' : 'folder';
+    return node.children.length !== 0 && this.treeControl.isExpanded(node) ? 'folder_open' : 'folder';
   }
 }

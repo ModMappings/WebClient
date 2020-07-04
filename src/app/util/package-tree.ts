@@ -1,81 +1,105 @@
-import {Observable, of} from 'rxjs';
-import {first, map, mapTo, shareReplay} from 'rxjs/operators';
-import {LoadedPackage} from '../services/package.service';
-
 export interface PackageNode {
   name: string;
   simpleName: string;
-  hasChildren: boolean;
+  children: PackageNode[];
 }
 
-export type PackageLoader = (parentPackage: string) => Observable<LoadedPackage[]>;
+function getSimpleName(pkg: string): string {
+  const match = pkg.match(/\/([^/]+)$/);
+  return match == null ? pkg : match[1];
+}
+
+function getParentPackage(pkg: string): string {
+  const match = pkg.match(/^(.+)\/[^/]+$/);
+  return match == null ? '' : match[1];
+}
+
+function* getPackageParts(pkg: string): Iterable<string> {
+  const parts = pkg.split('/');
+  let current = null;
+  for (const part of parts) {
+    if (current == null) {
+      current = part;
+    } else {
+      current = `${current}/${part}`;
+    }
+    yield(current);
+  }
+}
 
 export class PackageTree {
 
-  readonly rootNode: PackageNode = {
-    name: '',
-    simpleName: '',
-    hasChildren: true
-  };
+  private readonly nodes: Map<string, PackageNode>;
+  readonly root: PackageNode;
 
-  private readonly loader: PackageLoader;
-  private loadingMap = new Map<string, Observable<PackageNode[]>>();
-  private childMap = new Map<string, PackageNode[]>();
-
-  constructor(loader: PackageLoader) {
-    this.loader = loader;
-  }
-
-  isLoadingChildren(name: string): boolean {
-    return this.loadingMap.has(name);
-  }
-
-  getImmediateChildrenIfLoaded(name: string): PackageNode[] | null {
-    const children = this.childMap.get(name);
-    return children == null ? null : children;
-  }
-
-  loadChildren(name: string): Observable<void> {
-    return this.getImmediateChildren(name).pipe(mapTo(undefined));
-  }
-
-  getImmediateChildren(name: string): Observable<PackageNode[]> {
-    const loading = this.loadingMap.get(name);
-    if (loading != null) {
-      return loading;
-    }
-    const children = this.childMap.get(name);
-    if (children != null) {
-      return of(children);
-    }
-
-    const loader = this.loader(name).pipe(
-      first(),
-      map(rawChildren => {
-        return rawChildren.map(pkg => parsePackage(pkg));
-      }),
-      shareReplay(1)
-    );
-
-    this.loadingMap.set(name, loader);
-    loader.subscribe({
-      next: c => this.childMap.set(name, c),
-      complete: () => {
-        this.loadingMap.delete(name);
+  constructor(packages: string[]) {
+    const rootNode: PackageNode = {
+      simpleName: '',
+      name: '',
+      children: []
+    };
+    const nodes = new Map<string, PackageNode>([['', rootNode]]);
+    for (const pkg of packages.sort()) {
+      for (const pkgPart of getPackageParts(pkg)) {
+        const node = nodes.get(pkgPart);
+        if (node == null) {
+          const newNode: PackageNode = {
+            name: pkgPart,
+            simpleName: getSimpleName(pkgPart),
+            children: []
+          };
+          nodes.set(pkgPart, newNode);
+          const parentPkg = getParentPackage(pkgPart);
+          const parentNode = nodes.get(parentPkg);
+          if (parentNode == null) {
+            throw new Error('Processing child package before parent. This should be impossible');
+          }
+          parentNode.children.push(newNode);
+        }
       }
-    });
+    }
+    for (const node of nodes.values()) {
+      if (node.name !== '' && node.children.length === 1) {
+        const onlyChild = node.children[0];
+        const newNode: PackageNode = {
+          name: onlyChild.name,
+          simpleName: node.simpleName + '/' + onlyChild.simpleName,
+          children: onlyChild.children
+        };
+        nodes.delete(node.name);
+        nodes.set(onlyChild.name, newNode);
+        let parent: PackageNode | undefined;
+        let currentPkg = node.name;
+        do {
+          currentPkg = getParentPackage(currentPkg);
+          parent = nodes.get(currentPkg);
+        } while (parent == null && currentPkg !== '');
+        if (parent != null) {
+          const idx = parent.children.indexOf(node);
+          if (idx !== -1) {
+            parent.children[idx] = newNode;
+          }
+        }
+      }
+      // node.children = node.children.map(child => {
+      //   if (child.children.length === 1) {
+      //     const onlyChild = child.children[0];
+      //     return {
+      //       name: child.name + '/' + onlyChild.simpleName,
+      //       simpleName: child.simpleName + '/' + onlyChild.simpleName,
+      //       children: onlyChild.children
+      //     };
+      //   } else {
+      //     return child;
+      //   }
+      // });
+    }
 
-    loader.subscribe();
-
-    return loader;
+    this.root = rootNode;
+    this.nodes = nodes;
   }
-}
 
-function parsePackage(pkg: LoadedPackage): PackageNode {
-  const match = pkg.name.match(/\.([^.]+)$/);
-  return {
-    name: pkg.name,
-    simpleName: match == null ? pkg.name : match[1],
-    hasChildren: pkg.hasChildren
-  };
+  getNode(name: string): PackageNode | undefined {
+    return this.nodes.get(name);
+  }
 }
