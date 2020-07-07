@@ -31,9 +31,22 @@
     background: #00000077;
   }
 
+  .header {
+    display: grid;
+    grid-template-columns: auto auto;
+    .header-left {
+      padding-left: 16px;
+    }
+  }
+
+  .table-wrapper {
+
+  }
+
   table {
     width: 100%;
     table-layout: auto;
+    padding-left: 16px;
 
     tr {
       td, th {

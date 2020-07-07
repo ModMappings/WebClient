@@ -10,6 +10,7 @@ import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatTableModule} from '@angular/material/table';
 import {MatSortModule} from '@angular/material/sort';
+import {MatInputModule} from '@angular/material/input';
 
 @NgModule({
   declarations: [HomePageComponent],
@@ -23,7 +24,8 @@ import {MatSortModule} from '@angular/material/sort';
     MatPaginatorModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    MatSortModule
+    MatSortModule,
+    MatInputModule
   ]
 })
 export class HomeModule { }

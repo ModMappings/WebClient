@@ -11,11 +11,12 @@ import {
   MappingType,
   MappingTypesService
 } from '../../../../generated';
-import {distinctUntilChanged, filter, map, startWith, switchMap} from 'rxjs/operators';
+import {debounceTime, distinctUntilChanged, filter, map, startWith, switchMap} from 'rxjs/operators';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {BehaviorSubject, combineLatest, ReplaySubject, Subject} from 'rxjs';
 import {MatSort} from '@angular/material/sort';
+import {caseInsensitiveRegex, quoteRegex} from '../../../util/quote-regex';
 
 const packages = [
   'com/mojang/blaze3d',
@@ -237,6 +238,8 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   mappingTypeControl: FormControl;
   selectionFormGroup: FormGroup;
 
+  searchControl: FormControl;
+
   constructor(
     private router: Router,
     private mappingTypesService: MappingTypesService,
@@ -248,6 +251,8 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       gameVersion: (this.gameVersionControl = new FormControl(null, Validators.required)),
       mappingType: (this.mappingTypeControl = new FormControl(null, Validators.required))
     });
+    this.searchControl = new FormControl('');
+    this.searchControl.disable();
     this.gameVersionControl.disable();
     this.mappingTypeControl.disable();
   }
@@ -265,7 +270,6 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-
     combineLatest([
       this.selectionFormGroup.valueChanges.pipe(
         map(value => ({
@@ -284,18 +288,23 @@ export class HomePageComponent implements OnInit, AfterViewInit {
           pageIndex: this.matPaginator.pageIndex,
           pageSize: this.matPaginator.pageSize
         })
+      ),
+      this.searchControl.valueChanges.pipe(
+        startWith(String(this.searchControl.value)),
+        debounceTime(300),
+        map(v => String(v).trim())
       )
     ]).pipe(
       filter(([{gameVersion, mappingType}]) => {
         return gameVersion != null && mappingType != null;
       }),
       distinctUntilChanged((a, b) => fastDeepEqual(a, b)),
-      switchMap(([{gameVersion, mappingType}, {active, direction}, {pageSize, pageIndex}]) => {
+      switchMap(([{gameVersion, mappingType}, {active, direction}, {pageSize, pageIndex}, searchValue]) => {
         const sort = active ? [`${active},${direction}`] : undefined;
         this.mappingsLoading = true;
         return this.mappingsService.getMappingsBySearchCriteria(
-          undefined, undefined, undefined, MappableType.METHOD,
-          '^[^<]', undefined,
+          undefined, undefined, undefined, MappableType.CLASS,
+          undefined, searchValue === '' ? undefined : caseInsensitiveRegex(searchValue),
           mappingType?.id, gameVersion?.id, undefined, pageIndex, pageSize, sort
         );
       })
@@ -310,7 +319,12 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       }
       this.mappingsTotalCount = page.totalElements ?? 0;
       this.mappingsLoading = false;
+      this.searchControl.enable();
     });
+  }
+
+  get matPaginatorDisabled(): boolean {
+    return this.selectionFormGroup.invalid;
   }
 
   selectGameVersion(gameVersion: GameVersion) {
