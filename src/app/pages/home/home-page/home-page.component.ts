@@ -13,10 +13,10 @@ import {
 } from '../../../../generated';
 import {debounceTime, distinctUntilChanged, filter, map, startWith, switchMap} from 'rxjs/operators';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {BehaviorSubject, combineLatest, ReplaySubject, Subject} from 'rxjs';
+import {MatPaginator} from '@angular/material/paginator';
+import {combineLatest} from 'rxjs';
 import {MatSort} from '@angular/material/sort';
-import {caseInsensitiveRegex, quoteRegex} from '../../../util/quote-regex';
+import {quoteRegex} from '../../../util/quote-regex';
 
 const packages = [
   'com/mojang/blaze3d',
@@ -304,7 +304,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         this.mappingsLoading = true;
         return this.mappingsService.getMappingsBySearchCriteria(
           undefined, undefined, undefined, MappableType.CLASS,
-          undefined, searchValue === '' ? undefined : caseInsensitiveRegex(searchValue),
+          undefined, searchValue === '' ? undefined : '(?i)' + quoteRegex(searchValue),
           mappingType?.id, gameVersion?.id, undefined, pageIndex, pageSize, sort
         );
       })
