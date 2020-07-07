@@ -11,11 +11,11 @@ import {
   MappingType,
   MappingTypesService
 } from '../../../../generated';
-import {debounceTime, distinctUntilChanged, filter, map, startWith, switchMap} from 'rxjs/operators';
+import {debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, switchMap, tap} from 'rxjs/operators';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {MatPaginator} from '@angular/material/paginator';
-import {combineLatest} from 'rxjs';
-import {MatSort} from '@angular/material/sort';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {combineLatest, merge, Subject} from 'rxjs';
+import {MatSort, Sort} from '@angular/material/sort';
 import {quoteRegex} from '../../../util/quote-regex';
 
 const packages = [
@@ -207,11 +207,6 @@ const packages = [
   'net/minecraft/world/storage/loot/functions',
 ];
 
-interface Sort {
-  property: keyof Mapping;
-  direction: 'asc' | 'desc';
-}
-
 @Component({
   selector: 'app-home-page',
   templateUrl: './home-page.component.html',
@@ -239,6 +234,9 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   selectionFormGroup: FormGroup;
 
   searchControl: FormControl;
+
+  pageChanged = new Subject<PageEvent>();
+  sortChanged = new Subject<Sort>();
 
   constructor(
     private router: Router,
@@ -270,6 +268,18 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    const debouncedSearchValues = this.searchControl.valueChanges.pipe(
+      startWith(String(this.searchControl.value)),
+      debounceTime(300),
+      map(v => String(v).trim()),
+      distinctUntilChanged(),
+      shareReplay(1)
+    );
+
+    debouncedSearchValues.subscribe(() => {
+      this.matPaginator.pageIndex = 0;
+    });
+
     combineLatest([
       this.selectionFormGroup.valueChanges.pipe(
         map(value => ({
@@ -277,23 +287,21 @@ export class HomePageComponent implements OnInit, AfterViewInit {
           mappingType: value.mappingType as MappingType | null
         }))
       ),
-      this.matSort.sortChange.pipe(
-        startWith({
+      this.sortChanged.pipe(
+        startWith(undefined),
+        map(() => ({
           active: this.matSort.active,
           direction: this.matSort.direction
-        })
+        }))
       ),
-      this.matPaginator.page.pipe(
-        startWith({
+      merge(debouncedSearchValues, this.pageChanged).pipe(
+        startWith(undefined),
+        map(() => ({
           pageIndex: this.matPaginator.pageIndex,
           pageSize: this.matPaginator.pageSize
-        })
+        })),
       ),
-      this.searchControl.valueChanges.pipe(
-        startWith(String(this.searchControl.value)),
-        debounceTime(300),
-        map(v => String(v).trim())
-      )
+      debouncedSearchValues
     ]).pipe(
       filter(([{gameVersion, mappingType}]) => {
         return gameVersion != null && mappingType != null;
@@ -312,7 +320,6 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       if (page.content != null) {
         const start = (page.number ?? 0) * (page.size ?? 0);
         const end = start + (page.size ?? 0);
-        console.log(start, end);
         this.mappings = page.content.slice(start, end);
       } else {
         this.mappings = [];
@@ -325,30 +332,6 @@ export class HomePageComponent implements OnInit, AfterViewInit {
 
   get matPaginatorDisabled(): boolean {
     return this.selectionFormGroup.invalid;
-  }
-
-  selectGameVersion(gameVersion: GameVersion) {
-    if (this.mappingTypes != null) {
-      this.gameVersion = gameVersion;
-      this.packageTree = new PackageTree(packages);
-    }
-  }
-
-  selectPackage(pkg: string) {
-    if (this.mappingTypes != null && this.gameVersion != null) {
-      const regex = `^${pkg.replace(/\//g, '\\/')}\\/[^\\/]+$`;
-      this.classesLoading = true;
-      this.mappingsService.getMappingsBySearchCriteria(
-        undefined, undefined, undefined, MappableType.CLASS,
-        undefined, regex, this.mappingTypes[0].id, this.gameVersion.id, undefined, 1, 10
-      ).subscribe(mappings => {
-        this.classesLoading = false;
-        this.classes = mappings.content == null ? [] : mappings.content.map(mapping => {
-          return mapping.output || '';
-        });
-        this.classes = this.classes.slice(0, Math.min(this.classes.length, 20));
-      });
-    }
   }
 
   search(value: string) {

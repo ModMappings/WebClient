@@ -35,11 +35,11 @@
         </mat-form-field>
       </div>
       <mat-paginator [length]="mappingsTotalCount" [pageSize]="10" [disabled]="matPaginatorDisabled"
-                     [pageSizeOptions]="[10, 25, 50]">
+                     [pageSizeOptions]="[10, 25, 50]" (page)="pageChanged.next($event)">
       </mat-paginator>
     </div>
     <div class="table-wrapper">
-      <table mat-table [dataSource]="mappings" matSort matSortActive="input" matSortDirection="asc">
+      <table mat-table [dataSource]="mappings" matSort matSortActive="input" matSortDirection="asc" (matSortChange)="sortChanged.next($event)">
         <ng-container matColumnDef="input">
           <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Input</th>
           <td mat-cell *matCellDef="let element">{{ element.input }}</td>
