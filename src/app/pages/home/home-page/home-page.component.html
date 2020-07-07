@@ -1,15 +1,39 @@
 <div class="home-container" style="display: block; margin-left: 30px">
   <app-global-search-box></app-global-search-box>
-  <app-game-versions-selector (selectGameVersion)="selectGameVersion($event)">
-  </app-game-versions-selector>
-  <div class="wrapper">
-    <app-package-tree [tree]="packageTree" *ngIf="packageTree != null" (packageSelected)="selectPackage($event)">
-    </app-package-tree>
-    <div class="class-list">
-      <ul *ngIf="!classesLoading">
-        <li *ngFor="let cls of classes">{{ cls }}</li>
-      </ul>
-      <app-loading-spinner *ngIf="classesLoading"></app-loading-spinner>
+  <!--  <app-game-versions-selector (selectGameVersion)="selectGameVersion($event)">-->
+  <!--  </app-game-versions-selector>-->
+
+  <form [formGroup]="selectionFormGroup">
+    <mat-form-field>
+      <mat-label>Game version</mat-label>
+      <mat-select formControlName="gameVersion">
+        <mat-option [value]="gv" *ngFor="let gv of gameVersions">
+          {{ gv.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Mapping Type</mat-label>
+      <mat-select formControlName="mappingType">
+        <mat-option [value]="mt" *ngFor="let mt of mappingTypes">
+          {{ mt.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+
+  <mat-paginator [length]="mappingsTotalCount" [pageSize]="mappingsInitialPageSize" (page)="pageChange($event)"
+                 [pageSizeOptions]="[10, 25, 50]">
+  </mat-paginator>
+  <ng-container *ngIf="!mappingsLoading; else loadingSpinner">
+    <div *ngFor="let mapping of mappings">
+      <app-mapping-detail-view [mapping]="mapping">
+      </app-mapping-detail-view>
     </div>
-  </div>
+  </ng-container>
+
+  <ng-template #loadingSpinner>
+    <app-loading-spinner></app-loading-spinner>
+  </ng-template>
 </div>

@@ -20,6 +20,7 @@ import { MatTreeModule } from '@angular/material/tree';
 import {SignInButtonComponent} from './sign-in-button/sign-in-button.component';
 import {SignedInMenuComponent} from './signed-in-menu/signed-in-menu.component';
 import { LoadingSpinnerComponent } from './loading-spinner/loading-spinner.component';
+import { MappingDetailViewComponent } from './mapping-detail-view/mapping-detail-view.component';
 
 
 @NgModule({
@@ -31,7 +32,8 @@ import { LoadingSpinnerComponent } from './loading-spinner/loading-spinner.compo
     PackageTreeComponent,
     SignInButtonComponent,
     SignedInMenuComponent,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    MappingDetailViewComponent
   ],
   imports: [
     CommonModule,
@@ -48,14 +50,15 @@ import { LoadingSpinnerComponent } from './loading-spinner/loading-spinner.compo
     MatCardModule,
     MatDialogModule
   ],
-  exports: [
-    GameVersionsSelectorComponent,
-    ThemeSelectorComponent,
-    GlobalSearchBoxComponent,
-    NavbarComponent,
-    PackageTreeComponent,
-    LoadingSpinnerComponent
-  ],
+    exports: [
+        GameVersionsSelectorComponent,
+        ThemeSelectorComponent,
+        GlobalSearchBoxComponent,
+        NavbarComponent,
+        PackageTreeComponent,
+        LoadingSpinnerComponent,
+        MappingDetailViewComponent
+    ],
   entryComponents: [
     SignedInMenuComponent,
   ]

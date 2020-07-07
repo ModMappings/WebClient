@@ -1,9 +1,20 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {GameVersion} from '../../../services/game-version';
 import {PackageTree} from '../../../util/package-tree';
-import {PackageService} from '../../../services/package.service';
-import {MappableType, MappingsService, MappingType, MappingTypesService} from '../../../../generated';
+import * as fastDeepEqual from 'fast-deep-equal';
+import {
+  GameVersion,
+  GameVersionsService,
+  MappableType,
+  Mapping,
+  MappingsService,
+  MappingType,
+  MappingTypesService
+} from '../../../../generated';
+import {distinctUntilChanged, filter, map, switchMap} from 'rxjs/operators';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {PageEvent} from '@angular/material/paginator';
+import {BehaviorSubject, ReplaySubject, Subject} from 'rxjs';
 
 const packages = [
   'com/mojang/blaze3d',
@@ -201,6 +212,7 @@ const packages = [
 })
 export class HomePageComponent implements OnInit {
 
+  gameVersions: GameVersion[] | null = null;
   mappingTypes: MappingType[] | null = null;
   packageTree: PackageTree | null = null;
 
@@ -208,20 +220,85 @@ export class HomePageComponent implements OnInit {
   classes: string[] = [];
   private gameVersion: GameVersion | null = null;
 
+  mappingsInitialPageSize = 10;
+  private currentPageSettings = new BehaviorSubject({
+    pageSize: this.mappingsInitialPageSize,
+    pageIndex: 0
+  });
+
+  mappingsLoading = false;
+  mappingsTotalCount = 0;
+  mappings: Mapping[] | null;
+
+  gameVersionControl: FormControl;
+  mappingTypeControl: FormControl;
+  selectionFormGroup: FormGroup;
 
   constructor(
     private router: Router,
     private mappingTypesService: MappingTypesService,
-    private mappingsService: MappingsService
+    private mappingsService: MappingsService,
+    private gameVersionsService: GameVersionsService
   ) {
+
+    this.selectionFormGroup = new FormGroup({
+      gameVersion: (this.gameVersionControl = new FormControl(null, Validators.required)),
+      mappingType: (this.mappingTypeControl = new FormControl(null, Validators.required))
+    });
+    this.gameVersionControl.disable();
+    this.mappingTypeControl.disable();
   }
 
   ngOnInit() {
+    this.gameVersionsService.getGameVersionsBySearchCriteria().subscribe(page => {
+      this.gameVersions = page?.content ?? [];
+      this.gameVersionControl.enable();
+    });
+
     this.mappingTypesService.getMappingTypesBySearchCriteria().subscribe(pmt => {
-      this.mappingTypes = pmt.content == null ? null : pmt.content;
+      this.mappingTypes = pmt?.content ?? [];
+      this.mappingTypeControl.enable();
+    });
+
+    this.selectionFormGroup.valueChanges.pipe(
+      map(value => ({
+        gameVersion: value.gameVersion as GameVersion | null,
+        mappingType: value.mappingType as MappingType | null
+      })),
+      filter(({gameVersion, mappingType}) => {
+        return gameVersion != null && mappingType != null;
+      }),
+      switchMap((formValue) => {
+        return this.currentPageSettings.pipe(
+          map(pageSettings => ({...pageSettings, ...formValue}))
+        );
+      }),
+      distinctUntilChanged((a, b) => fastDeepEqual(a, b)),
+      switchMap(({gameVersion, mappingType, pageIndex, pageSize}) => {
+        this.mappingsLoading = true;
+        return this.mappingsService.getMappingsBySearchCriteria(
+          undefined, undefined, undefined, MappableType.METHOD,
+          '^[^<]', undefined,
+          mappingType?.id, gameVersion?.id, undefined, pageIndex, pageSize
+        );
+      })
+    ).subscribe(page => {
+      if (page.content != null) {
+        const start = (page.number ?? 0) * (page.size ?? 0);
+        const end = start + (page.size ?? 0);
+        console.log(start, end);
+        this.mappings = page.content.slice(start, end);
+      } else {
+        this.mappings = [];
+      }
+      this.mappingsTotalCount = page.totalElements ?? 0;
+      this.mappingsLoading = false;
     });
   }
 
+  pageChange(event: PageEvent) {
+    this.currentPageSettings.next({pageSize: event.pageSize, pageIndex: event.pageIndex});
+  }
 
   selectGameVersion(gameVersion: GameVersion) {
     if (this.mappingTypes != null) {
