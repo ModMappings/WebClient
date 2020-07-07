@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {PackageTree} from '../../../util/package-tree';
 import * as fastDeepEqual from 'fast-deep-equal';
@@ -11,10 +11,11 @@ import {
   MappingType,
   MappingTypesService
 } from '../../../../generated';
-import {distinctUntilChanged, filter, map, switchMap} from 'rxjs/operators';
+import {distinctUntilChanged, filter, map, startWith, switchMap} from 'rxjs/operators';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {PageEvent} from '@angular/material/paginator';
-import {BehaviorSubject, ReplaySubject, Subject} from 'rxjs';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
+import {BehaviorSubject, combineLatest, ReplaySubject, Subject} from 'rxjs';
+import {MatSort} from '@angular/material/sort';
 
 const packages = [
   'com/mojang/blaze3d',
@@ -205,12 +206,20 @@ const packages = [
   'net/minecraft/world/storage/loot/functions',
 ];
 
+interface Sort {
+  property: keyof Mapping;
+  direction: 'asc' | 'desc';
+}
+
 @Component({
   selector: 'app-home-page',
   templateUrl: './home-page.component.html',
   styleUrls: ['./home-page.component.scss']
 })
-export class HomePageComponent implements OnInit {
+export class HomePageComponent implements OnInit, AfterViewInit {
+
+  @ViewChild(MatSort) matSort: MatSort;
+  @ViewChild(MatPaginator) matPaginator: MatPaginator;
 
   gameVersions: GameVersion[] | null = null;
   mappingTypes: MappingType[] | null = null;
@@ -219,12 +228,6 @@ export class HomePageComponent implements OnInit {
   classesLoading = false;
   classes: string[] = [];
   private gameVersion: GameVersion | null = null;
-
-  mappingsInitialPageSize = 10;
-  private currentPageSettings = new BehaviorSubject({
-    pageSize: this.mappingsInitialPageSize,
-    pageIndex: 0
-  });
 
   mappingsLoading = false;
   mappingsTotalCount = 0;
@@ -259,27 +262,41 @@ export class HomePageComponent implements OnInit {
       this.mappingTypes = pmt?.content ?? [];
       this.mappingTypeControl.enable();
     });
+  }
 
-    this.selectionFormGroup.valueChanges.pipe(
-      map(value => ({
-        gameVersion: value.gameVersion as GameVersion | null,
-        mappingType: value.mappingType as MappingType | null
-      })),
-      filter(({gameVersion, mappingType}) => {
+  ngAfterViewInit() {
+
+    combineLatest([
+      this.selectionFormGroup.valueChanges.pipe(
+        map(value => ({
+          gameVersion: value.gameVersion as GameVersion | null,
+          mappingType: value.mappingType as MappingType | null
+        }))
+      ),
+      this.matSort.sortChange.pipe(
+        startWith({
+          active: this.matSort.active,
+          direction: this.matSort.direction
+        })
+      ),
+      this.matPaginator.page.pipe(
+        startWith({
+          pageIndex: this.matPaginator.pageIndex,
+          pageSize: this.matPaginator.pageSize
+        })
+      )
+    ]).pipe(
+      filter(([{gameVersion, mappingType}]) => {
         return gameVersion != null && mappingType != null;
       }),
-      switchMap((formValue) => {
-        return this.currentPageSettings.pipe(
-          map(pageSettings => ({...pageSettings, ...formValue}))
-        );
-      }),
       distinctUntilChanged((a, b) => fastDeepEqual(a, b)),
-      switchMap(({gameVersion, mappingType, pageIndex, pageSize}) => {
+      switchMap(([{gameVersion, mappingType}, {active, direction}, {pageSize, pageIndex}]) => {
+        const sort = active ? [`${active},${direction}`] : undefined;
         this.mappingsLoading = true;
         return this.mappingsService.getMappingsBySearchCriteria(
           undefined, undefined, undefined, MappableType.METHOD,
           '^[^<]', undefined,
-          mappingType?.id, gameVersion?.id, undefined, pageIndex, pageSize
+          mappingType?.id, gameVersion?.id, undefined, pageIndex, pageSize, sort
         );
       })
     ).subscribe(page => {
@@ -294,10 +311,6 @@ export class HomePageComponent implements OnInit {
       this.mappingsTotalCount = page.totalElements ?? 0;
       this.mappingsLoading = false;
     });
-  }
-
-  pageChange(event: PageEvent) {
-    this.currentPageSettings.next({pageSize: event.pageSize, pageIndex: event.pageIndex});
   }
 
   selectGameVersion(gameVersion: GameVersion) {

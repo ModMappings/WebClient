@@ -12,3 +12,37 @@
   grid-template-columns: 300px auto;
   grid-column-gap: 20px;
 }
+
+.table-container {
+  position: relative;
+
+  .table-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #00000077;
+  }
+
+  table {
+    width: 100%;
+    table-layout: auto;
+
+    tr {
+      td, th {
+        padding: 0 10px;
+
+        &:last-child {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
