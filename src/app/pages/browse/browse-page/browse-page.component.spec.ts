@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { BrowsePageComponent } from './browse-page.component';
 
@@ -6,7 +6,7 @@ describe('BrowsePageComponent', () => {
   let component: BrowsePageComponent;
   let fixture: ComponentFixture<BrowsePageComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ BrowsePageComponent ]
     })

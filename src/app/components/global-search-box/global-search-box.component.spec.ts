@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { GlobalSearchBoxComponent } from './global-search-box.component';
 
@@ -6,7 +6,7 @@ describe('GlobalSearchBoxComponent', () => {
   let component: GlobalSearchBoxComponent;
   let fixture: ComponentFixture<GlobalSearchBoxComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ GlobalSearchBoxComponent ]
     })
