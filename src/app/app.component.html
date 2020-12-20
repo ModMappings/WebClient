@@ -1,8 +1,8 @@
-<div class="app-container" [class.loading]="routeLoading">
+<div class="app-container h-100 d-flex flex-column" [class.loading]="routeLoading">
   <app-navbar></app-navbar>
   <mat-progress-bar mode="indeterminate" color="primary" class="loading-indicator">
   </mat-progress-bar>
-  <div class="route-container">
+  <div class="route-container w-100" style="flex-grow: 1">
     <router-outlet></router-outlet>
   </div>
 </div>

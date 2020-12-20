@@ -7,7 +7,9 @@ import { GameVersionsService } from './api/gameVersions.service';
 import { MappablesService } from './api/mappables.service';
 import { MappingTypesService } from './api/mappingTypes.service';
 import { MappingsService } from './api/mappings.service';
+import { PackageService } from './api/package.service';
 import { ReleasesService } from './api/releases.service';
+import { SystemService } from './api/system.service';
 import { VersionedMappablesService } from './api/versionedMappables.service';
 
 @NgModule({

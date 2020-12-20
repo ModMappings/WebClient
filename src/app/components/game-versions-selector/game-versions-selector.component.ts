@@ -28,7 +28,7 @@ export class GameVersionsSelectorComponent implements OnInit, OnDestroy {
           return {
             id: version.id || '',
             createdBy: version.createdBy || '<unknown>',
-            createdOn: version.createdOn == null ? null : DateTime.fromJSDate(version.createdOn),
+            createdOn: version.createdOn == null ? null : DateTime.fromJSDate(new Date(Date.parse(version.createdOn))),
             name: version.name,
             preRelease: version.preRelease,
             snapshot: version.snapshot

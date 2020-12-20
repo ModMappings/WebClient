@@ -1,0 +1,12 @@
+<mat-sidenav-container class="w-100 h-100" hasBackdrop="false">
+  <mat-sidenav #sidenav mode="push" class="h-100 w-25" [(opened)]="opened">
+    <ng-content select="[nav]"></ng-content>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="h-100 w-100">
+    <div (click)="sidenav.toggle()" [ngStyle]="tabStyle">
+      <ng-content select="[toggle]"></ng-content>
+    </div>
+    <ng-content select="[content]"></ng-content>
+  </mat-sidenav-content>
+</mat-sidenav-container>

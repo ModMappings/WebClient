@@ -1,0 +1,28 @@
+<form [formGroup]="selectionFormGroup">
+  <mat-form-field>
+    <mat-label>Game version</mat-label>
+    <mat-select formControlName="gameVersion">
+      <mat-option [value]="gv" *ngFor="let gv of gameVersions">
+        {{ gv.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Mapping Type</mat-label>
+    <mat-select formControlName="mappingType">
+      <mat-option [value]="mt" *ngFor="let mt of mappingTypes">
+        {{ mt.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Release</mat-label>
+    <mat-select formControlName="release">
+      <mat-option [value]="r" *ngFor="let r of releases">
+        {{ r.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</form>

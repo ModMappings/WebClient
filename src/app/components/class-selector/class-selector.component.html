@@ -1,0 +1,16 @@
+<div class="d-flex flex-column h-100">
+  <div class="heading">
+    Class selector
+  </div>
+
+  <mat-list dense class="flex-grow-1 overflow-auto">
+    <ng-container *ngFor="let clz of selectedClasses">
+      <mat-list-item>
+        <span> {{clz}} </span>
+      </mat-list-item>
+    </ng-container>
+  </mat-list>
+</div>
+
+
+

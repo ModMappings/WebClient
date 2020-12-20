@@ -17,14 +17,14 @@ import { Sort } from './sort';
 export interface PageMappable { 
     totalElements?: number;
     totalPages?: number;
-    first?: boolean;
-    sort?: Sort;
-    number?: number;
-    numberOfElements?: number;
-    pageable?: Pageable;
-    last?: boolean;
     size?: number;
     content?: Array<Mappable>;
+    sort?: Sort;
+    numberOfElements?: number;
+    first?: boolean;
+    pageable?: Pageable;
+    last?: boolean;
+    number?: number;
     empty?: boolean;
 }
 

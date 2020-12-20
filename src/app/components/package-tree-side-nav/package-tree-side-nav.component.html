@@ -1,0 +1,11 @@
+<app-tabbed-sidenav-drawer>
+  <div nav>
+    <app-package-tree [selectionFilters]="selectionFilters" (packageSelected)="packageSelected.emit($event)"></app-package-tree>
+  </div>
+  <div toggle>
+    <mat-icon>folder</mat-icon>
+  </div>
+  <div content class="h-100 w-100">
+    <ng-content select="[content]"></ng-content>
+  </div>
+</app-tabbed-sidenav-drawer>

@@ -31,7 +31,7 @@ import { Configuration }                                     from '../configurat
 })
 export class VersionedMappablesService {
 
-    protected basePath = 'https://api.modmappings.org';
+    protected basePath = 'http://localhost:8080';
     public defaultHeaders = new HttpHeaders();
     public configuration = new Configuration();
     public encoder: HttpParameterCodec;
@@ -52,7 +52,7 @@ export class VersionedMappablesService {
 
 
     private addToHttpParams(httpParams: HttpParams, value: any, key?: string): HttpParams {
-        if (typeof value === "object") {
+        if (typeof value === "object" && value instanceof Date === false) {
             httpParams = this.addToHttpParamsRecursive(httpParams, value);
         } else {
             httpParams = this.addToHttpParamsRecursive(httpParams, value, key);
@@ -60,7 +60,11 @@ export class VersionedMappablesService {
         return httpParams;
     }
 
-    private addToHttpParamsRecursive(httpParams: HttpParams, value: any, key?: string): HttpParams {
+    private addToHttpParamsRecursive(httpParams: HttpParams, value?: any, key?: string): HttpParams {
+        if (value == null) {
+            return httpParams;
+        }
+
         if (typeof value === "object") {
             if (Array.isArray(value)) {
                 (value as any[]).forEach( elem => httpParams = this.addToHttpParamsRecursive(httpParams, elem, key));
@@ -258,15 +262,7 @@ export class VersionedMappablesService {
 
         let headers = this.defaultHeaders;
 
-        // authentication (ModMappings Local development auth) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (ModMappings Official auth) required
+        // authentication (ModMappings auth) required
         if (this.configuration.accessToken) {
             const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()

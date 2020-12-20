@@ -1,9 +1,12 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {NestedTreeControl, TreeControl} from '@angular/cdk/tree';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
+import {FlatTreeControl, NestedTreeControl} from '@angular/cdk/tree';
 import {MatTree, MatTreeNestedDataSource} from '@angular/material/tree';
 import {PackageNode, PackageTree} from '../../util/package-tree';
+import {Observable, SubscriptionLike} from 'rxjs';
+import {SelectedMappingFilters} from '../../util/selected-mappings-filter';
 import {map} from 'rxjs/operators';
-import {Observable} from 'rxjs';
+import {PackageManagementService} from '../../services/package-management.service';
+import {PackageTreeDatasource} from '../../util/package-tree-datasource';
 
 interface Node {
   name: string;
@@ -16,36 +19,74 @@ interface Node {
   templateUrl: './package-tree.component.html',
   styleUrls: ['./package-tree.component.scss']
 })
-export class PackageTreeComponent implements OnInit {
+export class PackageTreeComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input()
-  tree: PackageTree;
+  selectionFilters: SelectedMappingFilters | null = null;
 
   @Output()
   packageSelected = new EventEmitter<string>();
 
+  packageUpdateSubscription: SubscriptionLike | null = null;
 
-  treeControl: NestedTreeControl<PackageNode> = new NestedTreeControl<PackageNode>(node => {
-    return node.children;
-  });
-  dataSource = new MatTreeNestedDataSource<PackageNode>();
+  treeControl: FlatTreeControl<PackageNode>;
 
-  @ViewChild(MatTree)
-  matTree: MatTree<any>;
+  dataSource: PackageTreeDatasource;
 
-  hasChild = (_: number, node: PackageNode) => {
-    return node.children.length !== 0;
-  }
+  getLevel = (node: PackageNode) => node.depth;
 
-  constructor() {
+  isExpandable = (node: PackageNode) => node.children.length !== 0;
 
+  hasChild = (_: number, node: PackageNode) => node.children.length !== 0;
+
+  constructor(
+    private packageManagementService: PackageManagementService
+  ) {
+    this.treeControl = new FlatTreeControl<PackageNode>(this.getLevel, this.isExpandable);
+    this.dataSource = new PackageTreeDatasource(this.treeControl, packageName => {
+      return this.packageManagementService.getPackagesInWithDirectChildren(
+        `${packageName}/`,
+        this.selectionFilters?.gameVersion?.id,
+        this.selectionFilters?.mappingType?.id,
+        this.selectionFilters?.release?.id
+      );
+    });
   }
 
   ngOnInit() {
-    this.dataSource.data = this.tree.root.children;
+    this.dataSource.data = [];
+  }
+
+  ngOnDestroy(): void {
+    this.packageUpdateSubscription?.unsubscribe();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    this.updatePackages();
   }
 
   icon(node: PackageNode): string {
     return node.children.length !== 0 && this.treeControl.isExpanded(node) ? 'folder_open' : 'folder';
+  }
+
+  private updatePackages(): void {
+    if (this.selectionFilters == null)
+    {
+      this.dataSource.data = [];
+      return;
+    }
+
+    this.packageUpdateSubscription = this.packageManagementService.getPackagesInWithDirectChildren(
+      '',
+      this.selectionFilters.gameVersion?.id,
+      this.selectionFilters.mappingType?.id,
+      this.selectionFilters.release?.id)
+      .pipe(
+        map(packages => new PackageTree(packages))
+      ).subscribe(packageTree => this.dataSource.data = packageTree.root.children);
+  }
+
+  onNodeSelected(node: PackageNode) {
+    this.packageSelected.emit(node.name);
   }
 }

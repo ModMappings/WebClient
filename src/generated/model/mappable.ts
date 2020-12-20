@@ -27,7 +27,7 @@ export interface Mappable {
     /**
      * The moment the mappable was created.
      */
-    readonly createdOn?: Date;
+    readonly createdOn?: string;
     type?: MappableType;
 }
 

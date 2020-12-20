@@ -17,14 +17,14 @@ import { Mapping } from './mapping';
 export interface PageMapping { 
     totalElements?: number;
     totalPages?: number;
-    first?: boolean;
-    sort?: Sort;
-    number?: number;
-    numberOfElements?: number;
-    pageable?: Pageable;
-    last?: boolean;
     size?: number;
     content?: Array<Mapping>;
+    sort?: Sort;
+    numberOfElements?: number;
+    first?: boolean;
+    pageable?: Pageable;
+    last?: boolean;
+    number?: number;
     empty?: boolean;
 }
 

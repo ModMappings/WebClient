@@ -27,7 +27,7 @@ export interface Mapping {
     /**
      * The moment this mapping was created.
      */
-    readonly createdOn?: Date;
+    readonly createdOn?: string;
     /**
      * The id of the versioned mappable this mapping exists for.
      */

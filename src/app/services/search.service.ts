@@ -16,7 +16,6 @@ export class SearchService {
 
   constructor(private router: Router) {
     router.events.subscribe(event => {
-      console.log('hi?', event.constructor.name, event);
       if (event instanceof NavigationEnd) {
         let nextValue;
         if (/^\/search/.test(event.url)) {

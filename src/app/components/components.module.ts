@@ -21,6 +21,16 @@ import {SignInButtonComponent} from './sign-in-button/sign-in-button.component';
 import {SignedInMenuComponent} from './signed-in-menu/signed-in-menu.component';
 import { LoadingSpinnerComponent } from './loading-spinner/loading-spinner.component';
 import { MappingDetailViewComponent } from './mapping-detail-view/mapping-detail-view.component';
+import { MappingFiltersSelectorComponent } from './mapping-filters-selector/mapping-filters-selector.component';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { ClassSelectorComponent } from './class-selector/class-selector.component';
+import {ScrollingModule} from '@angular/cdk/scrolling';
+import {MatListModule} from '@angular/material/list';
+import { PackageTreeSideNavComponent } from './package-tree-side-nav/package-tree-side-nav.component';
+import { TabbedSidenavDrawerComponent } from './tabbed-sidenav-drawer/tabbed-sidenav-drawer.component';
+import {MatSidenavModule} from '@angular/material/sidenav';
+import { ClassSelectorSideNavComponent } from './class-selector-side-nav/class-selector-side-nav.component';
 
 
 @NgModule({
@@ -33,32 +43,46 @@ import { MappingDetailViewComponent } from './mapping-detail-view/mapping-detail
     SignInButtonComponent,
     SignedInMenuComponent,
     LoadingSpinnerComponent,
-    MappingDetailViewComponent
+    MappingDetailViewComponent,
+    MappingFiltersSelectorComponent,
+    ClassSelectorComponent,
+    PackageTreeSideNavComponent,
+    TabbedSidenavDrawerComponent,
+    ClassSelectorSideNavComponent
   ],
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatMenuModule,
-    MatInputModule,
-    ReactiveFormsModule,
-    MatAutocompleteModule,
-    MatToolbarModule,
-    RouterModule,
-    MatIconModule,
-    MatTreeModule,
-    MatCardModule,
-    MatDialogModule
-  ],
-    exports: [
-        GameVersionsSelectorComponent,
-        ThemeSelectorComponent,
-        GlobalSearchBoxComponent,
-        NavbarComponent,
-        PackageTreeComponent,
-        LoadingSpinnerComponent,
-        MappingDetailViewComponent
+    imports: [
+        CommonModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatMenuModule,
+        MatInputModule,
+        ReactiveFormsModule,
+        MatAutocompleteModule,
+        MatToolbarModule,
+        RouterModule,
+        MatIconModule,
+        MatTreeModule,
+        MatCardModule,
+        MatDialogModule,
+        MatProgressBarModule,
+        MatProgressSpinnerModule,
+        ScrollingModule,
+        MatListModule,
+        MatSidenavModule
     ],
+  exports: [
+    GameVersionsSelectorComponent,
+    ThemeSelectorComponent,
+    GlobalSearchBoxComponent,
+    NavbarComponent,
+    PackageTreeComponent,
+    LoadingSpinnerComponent,
+    MappingDetailViewComponent,
+    MappingFiltersSelectorComponent,
+    ClassSelectorComponent,
+    PackageTreeSideNavComponent,
+    ClassSelectorSideNavComponent
+  ],
   entryComponents: [
     SignedInMenuComponent,
   ]

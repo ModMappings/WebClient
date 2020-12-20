@@ -23,7 +23,7 @@ export interface MappingType {
     /**
      * The moment the mapping type was created.
      */
-    readonly createdOn?: Date;
+    readonly createdOn?: string;
     /**
      * The name of the mapping type. Has to be unique.
      */

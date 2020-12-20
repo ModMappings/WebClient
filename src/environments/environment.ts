@@ -9,6 +9,7 @@ export const environment: Environment = {
   publicUrl: 'http://localhost:4200',
   openIdServer: 'http://localhost:8081/auth/realms/ModMappings',
   openIdClientId: 'web_frontend',
+  // apiBaseUrl: 'https://dev.api.modmappings.org'
   apiBaseUrl: 'http://localhost:8080'
 };
 

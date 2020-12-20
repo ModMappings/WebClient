@@ -1,1 +1,9 @@
-<app-package-tree></app-package-tree>
+<div class="d-flex p-2 flex-column w-100 h-100">
+  <div class="w-100">
+    <app-mapping-filters-selector (changed)="this.selectedFilters = $event"></app-mapping-filters-selector>
+  </div>
+
+  <app-package-tree-side-nav class="w-100 h-100 flex-grow-1" [selectionFilters]="selectedFilters" (packageSelected)="onPackageSelected($event)">
+    <app-class-selector-side-nav content class="h-100" [selectionFilters]="selectedFilters" [packageName]="selectedPackage"></app-class-selector-side-nav>
+  </app-package-tree-side-nav>
+</div>

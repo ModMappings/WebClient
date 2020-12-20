@@ -19,6 +19,7 @@ import { Observable }                                        from 'rxjs';
 
 import { MappableType } from '../model/models';
 import { Mapping } from '../model/models';
+import { PageDetailedMapping } from '../model/models';
 import { PageMapping } from '../model/models';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -31,7 +32,7 @@ import { Configuration }                                     from '../configurat
 })
 export class MappingsService {
 
-    protected basePath = 'https://api.modmappings.org';
+    protected basePath = 'http://localhost:8080';
     public defaultHeaders = new HttpHeaders();
     public configuration = new Configuration();
     public encoder: HttpParameterCodec;
@@ -52,7 +53,7 @@ export class MappingsService {
 
 
     private addToHttpParams(httpParams: HttpParams, value: any, key?: string): HttpParams {
-        if (typeof value === "object") {
+        if (typeof value === "object" && value instanceof Date === false) {
             httpParams = this.addToHttpParamsRecursive(httpParams, value);
         } else {
             httpParams = this.addToHttpParamsRecursive(httpParams, value, key);
@@ -60,7 +61,11 @@ export class MappingsService {
         return httpParams;
     }
 
-    private addToHttpParamsRecursive(httpParams: HttpParams, value: any, key?: string): HttpParams {
+    private addToHttpParamsRecursive(httpParams: HttpParams, value?: any, key?: string): HttpParams {
+        if (value == null) {
+            return httpParams;
+        }
+
         if (typeof value === "object") {
             if (Array.isArray(value)) {
                 (value as any[]).forEach( elem => httpParams = this.addToHttpParamsRecursive(httpParams, elem, key));
@@ -105,15 +110,7 @@ export class MappingsService {
 
         let headers = this.defaultHeaders;
 
-        // authentication (ModMappings Local development auth) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (ModMappings Official auth) required
+        // authentication (ModMappings auth) required
         if (this.configuration.accessToken) {
             const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
@@ -151,6 +148,113 @@ export class MappingsService {
         return this.httpClient.post<Mapping>(`${this.configuration.basePath}/mappings/${encodeURIComponent(String(mappingType))}/${encodeURIComponent(String(versionedMappable))}`,
             mapping,
             {
+                responseType: <any>responseType,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Gets all known mappings, and their metadata, and finds the ones that match the given parameters.
+     * @param latestOnly Indicates if only latest mappings for a given versioned mappable should be taken into account. Defaults to true if not supplied.
+     * @param versionedMappableId The id of the versioned mappable to filter on.
+     * @param releaseId The id of the release to filter on.
+     * @param mappableType The mappable type to filter on.
+     * @param inputRegex The regular expression to match the input of the mapping against.
+     * @param outputRegex The regular expression to match the output of the mapping against.
+     * @param mappingTypeId The id of the mapping type to filter on.
+     * @param gameVersionId The id of the game version to filter on.
+     * @param createdBy The id of the user who created a mapping to filter on.
+     * @param page Zero-based page index (0..N)
+     * @param size The size of the page to be returned
+     * @param sort Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getDetailedMappingsBySearchCriteria(latestOnly?: boolean, versionedMappableId?: string, releaseId?: string, mappableType?: MappableType, inputRegex?: string, outputRegex?: string, mappingTypeId?: string, gameVersionId?: string, createdBy?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<PageDetailedMapping>;
+    public getDetailedMappingsBySearchCriteria(latestOnly?: boolean, versionedMappableId?: string, releaseId?: string, mappableType?: MappableType, inputRegex?: string, outputRegex?: string, mappingTypeId?: string, gameVersionId?: string, createdBy?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpResponse<PageDetailedMapping>>;
+    public getDetailedMappingsBySearchCriteria(latestOnly?: boolean, versionedMappableId?: string, releaseId?: string, mappableType?: MappableType, inputRegex?: string, outputRegex?: string, mappingTypeId?: string, gameVersionId?: string, createdBy?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpEvent<PageDetailedMapping>>;
+    public getDetailedMappingsBySearchCriteria(latestOnly?: boolean, versionedMappableId?: string, releaseId?: string, mappableType?: MappableType, inputRegex?: string, outputRegex?: string, mappingTypeId?: string, gameVersionId?: string, createdBy?: string, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<any> {
+
+        let queryParameters = new HttpParams({encoder: this.encoder});
+        if (latestOnly !== undefined && latestOnly !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>latestOnly, 'latestOnly');
+        }
+        if (versionedMappableId !== undefined && versionedMappableId !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>versionedMappableId, 'versionedMappableId');
+        }
+        if (releaseId !== undefined && releaseId !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>releaseId, 'releaseId');
+        }
+        if (mappableType !== undefined && mappableType !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>mappableType, 'mappableType');
+        }
+        if (inputRegex !== undefined && inputRegex !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>inputRegex, 'inputRegex');
+        }
+        if (outputRegex !== undefined && outputRegex !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>outputRegex, 'outputRegex');
+        }
+        if (mappingTypeId !== undefined && mappingTypeId !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>mappingTypeId, 'mappingTypeId');
+        }
+        if (gameVersionId !== undefined && gameVersionId !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>gameVersionId, 'gameVersionId');
+        }
+        if (createdBy !== undefined && createdBy !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>createdBy, 'createdBy');
+        }
+        if (page !== undefined && page !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>page, 'page');
+        }
+        if (size !== undefined && size !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>size, 'size');
+        }
+        if (sort) {
+            sort.forEach((element) => {
+                queryParameters = this.addToHttpParams(queryParameters,
+                  <any>element, 'sort');
+            })
+        }
+
+        let headers = this.defaultHeaders;
+
+        let httpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
+        if (httpHeaderAcceptSelected === undefined) {
+            // to determine the Accept header
+            const httpHeaderAccepts: string[] = [
+                'text/event-stream',
+                'application/json'
+            ];
+            httpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        }
+        if (httpHeaderAcceptSelected !== undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+
+        let responseType: 'text' | 'json' = 'json';
+        if(httpHeaderAcceptSelected && httpHeaderAcceptSelected.startsWith('text')) {
+            responseType = 'text';
+        }
+
+        return this.httpClient.get<PageDetailedMapping>(`${this.configuration.basePath}/mappings/detailed`,
+            {
+                params: queryParameters,
                 responseType: <any>responseType,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,

@@ -23,7 +23,7 @@ export interface Release {
     /**
      * The moment the release was created.
      */
-    readonly createdOn?: Date;
+    readonly createdOn?: string;
     /**
      * The name of the release, has to be unique inside a given mapping type.
      */
@@ -36,26 +36,6 @@ export interface Release {
      * The id of the mapping type for which this release is.
      */
     readonly mappingType: string;
-    /**
-     * The ids of the mappings which remap classes that are part of this release
-     */
-    readonly classMappings: Array<string>;
-    /**
-     * The ids of the mappings which remap methods that are part of this release
-     */
-    readonly methodMappings: Array<string>;
-    /**
-     * The ids of the mappings which remap fields that are part of this release
-     */
-    readonly fieldMappings: Array<string>;
-    /**
-     * The ids of the mappings which remap parameters that are part of this release
-     */
-    readonly parameterMappings: Array<string>;
-    /**
-     * The ids of the comments which were made on this release.
-     */
-    readonly commentsMappings: Array<string>;
     /**
      * The state of the release. Indicates how much of the release has been imported. Most releases have FIELD as final state. However PARAMETER is also possible.
      */

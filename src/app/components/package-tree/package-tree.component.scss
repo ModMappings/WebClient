@@ -22,3 +22,22 @@ button[mat-icon-button] {
   width: 24px;
   line-height: 24px;
 }
+
+.progress-loading-spinner-container {
+  font-size: 18px;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tree-element-header {
+  margin-right: 3px;
+}
+
+.package-selector {
+  cursor: pointer;
+}
+

@@ -30,7 +30,7 @@ import { Configuration }                                     from '../configurat
 })
 export class ReleasesService {
 
-    protected basePath = 'https://api.modmappings.org';
+    protected basePath = 'http://localhost:8080';
     public defaultHeaders = new HttpHeaders();
     public configuration = new Configuration();
     public encoder: HttpParameterCodec;
@@ -51,7 +51,7 @@ export class ReleasesService {
 
 
     private addToHttpParams(httpParams: HttpParams, value: any, key?: string): HttpParams {
-        if (typeof value === "object") {
+        if (typeof value === "object" && value instanceof Date === false) {
             httpParams = this.addToHttpParamsRecursive(httpParams, value);
         } else {
             httpParams = this.addToHttpParamsRecursive(httpParams, value, key);
@@ -59,7 +59,11 @@ export class ReleasesService {
         return httpParams;
     }
 
-    private addToHttpParamsRecursive(httpParams: HttpParams, value: any, key?: string): HttpParams {
+    private addToHttpParamsRecursive(httpParams: HttpParams, value?: any, key?: string): HttpParams {
+        if (value == null) {
+            return httpParams;
+        }
+
         if (typeof value === "object") {
             if (Array.isArray(value)) {
                 (value as any[]).forEach( elem => httpParams = this.addToHttpParamsRecursive(httpParams, elem, key));
@@ -104,15 +108,7 @@ export class ReleasesService {
 
         let headers = this.defaultHeaders;
 
-        // authentication (ModMappings Local development auth) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (ModMappings Official auth) required
+        // authentication (ModMappings auth) required
         if (this.configuration.accessToken) {
             const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
@@ -176,15 +172,7 @@ export class ReleasesService {
 
         let headers = this.defaultHeaders;
 
-        // authentication (ModMappings Local development auth) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (ModMappings Official auth) required
+        // authentication (ModMappings auth) required
         if (this.configuration.accessToken) {
             const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()
@@ -272,7 +260,7 @@ export class ReleasesService {
      * @param gameVersion The id of the game version to filter releases on.
      * @param mappingType The id of the mapping type to filter releases on.
      * @param snapshot Determines if snapshot releases are supposed to be filtered out, leave the parameter out to not filter on snapshot state of releases.
-     * @param mapping The id of the mapping to filter releases on.
+     * @param mappingId The id of the mapping to filter releases on.
      * @param user The id of the user who created the release to filter releases on.
      * @param page Zero-based page index (0..N)
      * @param size The size of the page to be returned
@@ -280,10 +268,10 @@ export class ReleasesService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getReleasesBySearchCriteria(name?: string, gameVersion?: string, mappingType?: string, snapshot?: boolean, mapping?: string, user?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<PageRelease>;
-    public getReleasesBySearchCriteria(name?: string, gameVersion?: string, mappingType?: string, snapshot?: boolean, mapping?: string, user?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpResponse<PageRelease>>;
-    public getReleasesBySearchCriteria(name?: string, gameVersion?: string, mappingType?: string, snapshot?: boolean, mapping?: string, user?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpEvent<PageRelease>>;
-    public getReleasesBySearchCriteria(name?: string, gameVersion?: string, mappingType?: string, snapshot?: boolean, mapping?: string, user?: string, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<any> {
+    public getReleasesBySearchCriteria(name?: string, gameVersion?: string, mappingType?: string, snapshot?: boolean, mappingId?: string, user?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<PageRelease>;
+    public getReleasesBySearchCriteria(name?: string, gameVersion?: string, mappingType?: string, snapshot?: boolean, mappingId?: string, user?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpResponse<PageRelease>>;
+    public getReleasesBySearchCriteria(name?: string, gameVersion?: string, mappingType?: string, snapshot?: boolean, mappingId?: string, user?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpEvent<PageRelease>>;
+    public getReleasesBySearchCriteria(name?: string, gameVersion?: string, mappingType?: string, snapshot?: boolean, mappingId?: string, user?: string, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<any> {
 
         let queryParameters = new HttpParams({encoder: this.encoder});
         if (name !== undefined && name !== null) {
@@ -302,9 +290,9 @@ export class ReleasesService {
           queryParameters = this.addToHttpParams(queryParameters,
             <any>snapshot, 'snapshot');
         }
-        if (mapping !== undefined && mapping !== null) {
+        if (mappingId !== undefined && mappingId !== null) {
           queryParameters = this.addToHttpParams(queryParameters,
-            <any>mapping, 'mapping');
+            <any>mappingId, 'mappingId');
         }
         if (user !== undefined && user !== null) {
           queryParameters = this.addToHttpParams(queryParameters,
@@ -376,15 +364,7 @@ export class ReleasesService {
 
         let headers = this.defaultHeaders;
 
-        // authentication (ModMappings Local development auth) required
-        if (this.configuration.accessToken) {
-            const accessToken = typeof this.configuration.accessToken === 'function'
-                ? this.configuration.accessToken()
-                : this.configuration.accessToken;
-            headers = headers.set('Authorization', 'Bearer ' + accessToken);
-        }
-
-        // authentication (ModMappings Official auth) required
+        // authentication (ModMappings auth) required
         if (this.configuration.accessToken) {
             const accessToken = typeof this.configuration.accessToken === 'function'
                 ? this.configuration.accessToken()

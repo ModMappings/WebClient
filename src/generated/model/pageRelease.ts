@@ -17,14 +17,14 @@ import { Release } from './release';
 export interface PageRelease { 
     totalElements?: number;
     totalPages?: number;
-    first?: boolean;
-    sort?: Sort;
-    number?: number;
-    numberOfElements?: number;
-    pageable?: Pageable;
-    last?: boolean;
     size?: number;
     content?: Array<Release>;
+    sort?: Sort;
+    numberOfElements?: number;
+    first?: boolean;
+    pageable?: Pageable;
+    last?: boolean;
+    number?: number;
     empty?: boolean;
 }
 

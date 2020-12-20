@@ -1,6 +1,8 @@
 export interface PackageNode {
   name: string;
   simpleName: string;
+  depth: number;
+  isLoading: boolean;
   children: PackageNode[];
 }
 
@@ -12,6 +14,10 @@ function getSimpleName(pkg: string): string {
 function getParentPackage(pkg: string): string {
   const match = pkg.match(/^(.+)\/[^/]+$/);
   return match == null ? '' : match[1];
+}
+
+function getPackageDepth(pkg: string): number {
+  return pkg.split('/').length - 1;
 }
 
 function* getPackageParts(pkg: string): Iterable<string> {
@@ -28,7 +34,6 @@ function* getPackageParts(pkg: string): Iterable<string> {
 }
 
 export class PackageTree {
-
   private readonly nodes: Map<string, PackageNode>;
   readonly root: PackageNode;
 
@@ -36,6 +41,8 @@ export class PackageTree {
     const rootNode: PackageNode = {
       simpleName: '',
       name: '',
+      depth: 0,
+      isLoading: false,
       children: []
     };
     const nodes = new Map<string, PackageNode>([['', rootNode]]);
@@ -46,6 +53,8 @@ export class PackageTree {
           const newNode: PackageNode = {
             name: pkgPart,
             simpleName: getSimpleName(pkgPart),
+            depth: getPackageDepth(pkgPart),
+            isLoading: false,
             children: []
           };
           nodes.set(pkgPart, newNode);
@@ -55,30 +64,6 @@ export class PackageTree {
             throw new Error('Processing child package before parent. This should be impossible');
           }
           parentNode.children.push(newNode);
-        }
-      }
-    }
-    for (const node of nodes.values()) {
-      if (node.name !== '' && node.children.length === 1) {
-        const onlyChild = node.children[0];
-        const newNode: PackageNode = {
-          name: onlyChild.name,
-          simpleName: node.simpleName + '/' + onlyChild.simpleName,
-          children: onlyChild.children
-        };
-        nodes.delete(node.name);
-        nodes.set(onlyChild.name, newNode);
-        let parent: PackageNode | undefined;
-        let currentPkg = node.name;
-        do {
-          currentPkg = getParentPackage(currentPkg);
-          parent = nodes.get(currentPkg);
-        } while (parent == null && currentPkg !== '');
-        if (parent != null) {
-          const idx = parent.children.indexOf(node);
-          if (idx !== -1) {
-            parent.children[idx] = newNode;
-          }
         }
       }
     }

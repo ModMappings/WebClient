@@ -23,7 +23,7 @@ export interface GameVersion {
     /**
      * The moment the game version was created.
      */
-    readonly createdOn?: Date;
+    readonly createdOn?: string;
     /**
      * The name of the game version. Has to be unique
      */

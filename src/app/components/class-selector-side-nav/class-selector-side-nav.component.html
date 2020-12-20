@@ -1,0 +1,11 @@
+<app-tabbed-sidenav-drawer class="h-100">
+  <div nav>
+    <app-class-selector [selectionFilters]="selectionFilters" [packageName]="packageName" (classSelected)="classSelected.emit($event)"></app-class-selector>
+  </div>
+  <div toggle>
+    <mat-icon>code</mat-icon>
+  </div>
+  <div content>
+    <ng-content select="[content]"></ng-content>
+  </div>
+</app-tabbed-sidenav-drawer>
