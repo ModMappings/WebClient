@@ -4,6 +4,7 @@ import {map, takeUntil} from 'rxjs/operators';
 import {GameVersion} from '../../services/game-version';
 import {GameVersionsService} from '../../../generated';
 import {DateTime} from 'luxon';
+import {getAllPages} from '../../util/observable-functions';
 
 @Component({
   selector: 'app-game-versions-selector',
@@ -22,9 +23,10 @@ export class GameVersionsSelectorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.gameVersionsService.getGameVersionsBySearchCriteria().pipe(
+    this.gameVersionsService.getGameVersionsBySearchCriteria({}).pipe(
+      getAllPages(pageIndex => this.gameVersionsService.getGameVersionsBySearchCriteria({page: pageIndex})),
       map(versions => {
-        return versions.content?.map(version => {
+        return versions.map(version => {
           return {
             id: version.id || '',
             createdBy: version.createdBy || '<unknown>',

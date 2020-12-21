@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges
 import {MappableType, Mapping, MappingsService} from '../../../generated';
 import {Observable, of, SubscriptionLike} from 'rxjs';
 import {SelectedMappingFilters} from '../../util/selected-mappings-filter';
-import {map, mergeMap} from 'rxjs/operators';
+import {getAllPages} from '../../util/observable-functions';
 
 @Component({
   selector: 'app-class-selector',
@@ -18,9 +18,9 @@ export class ClassSelectorComponent implements OnInit, OnChanges {
   selectionFilters: SelectedMappingFilters | null = null;
 
   @Output()
-  classSelected: EventEmitter<string> = new EventEmitter<string>();
+  classSelected: EventEmitter<Mapping> = new EventEmitter<Mapping>();
 
-  selectedClasses: string[] = [];
+  selectableClasses: Mapping[] = [];
 
   initialized = false;
   loading = false;
@@ -54,62 +54,46 @@ export class ClassSelectorComponent implements OnInit, OnChanges {
 
   private getAllMappingsInPackage() {
     this.pullMappingSubscription =
-      this.getClassMappingsInPackage(0)
-        .pipe(
-          map(mappings => {
-            return mappings.map(mapping => {
-              return mapping.output ?? '';
-            })
-            .filter(mapping => mapping !== '')
-            .map(mapping => {
-              return mapping.substr(mapping.lastIndexOf('/') + 1);
-            });
-          })
-        )
+      this.getClassMappingsInPackage()
         .subscribe(classes => {
-          this.selectedClasses = classes;
+          this.selectableClasses = classes.sort(((a, b) => a.output?.localeCompare(b.output ?? "") ?? 0));
           this.loading = false;
           this.pullMappingSubscription?.unsubscribe();
         });
   }
 
-  private getClassMappingsInPackage(page: number): Observable<Mapping[]> {
+  private getClassMappingsInPackage(): Observable<Mapping[]> {
     if (this.packageName === '') {
       return of([]);
     }
 
     return this.mappingService.getMappingsBySearchCriteria(
-      true,
-      undefined,
-      this.selectionFilters?.release?.id,
-      MappableType.CLASS,
-      undefined,
-      `${this.packageName}/[a-zA-Z_]+`,
-      this.selectionFilters?.mappingType?.id,
-      this.selectionFilters?.gameVersion?.id,
-      undefined,
-      page
+      {
+        latestOnly: true,
+        releaseId: this.selectionFilters?.release?.id,
+        mappableType: MappableType.CLASS,
+        outputRegex: `${this.packageName}/[a-zA-Z_]+`,
+        mappingTypeId: this.selectionFilters?.mappingType?.id,
+        gameVersionId: this.selectionFilters?.gameVersion?.id
+      }
     ).pipe(
-      mergeMap(currentPage => {
-        if (currentPage.last) {
-          return of(currentPage.content);
-        }
+      getAllPages(pageIndex =>
+        this.mappingService.getMappingsBySearchCriteria(
+          {
+            latestOnly: true,
+            releaseId: this.selectionFilters?.release?.id,
+            mappableType: MappableType.CLASS,
+            outputRegex: `${this.packageName}/[a-zA-Z_]+`,
+            mappingTypeId: this.selectionFilters?.mappingType?.id,
+            gameVersionId: this.selectionFilters?.gameVersion?.id,
+            page: pageIndex
+          }
+        )
+      )
+    );
+  }
 
-        const content = currentPage.content ?? [];
-        const currentPageNumber = currentPage.number ?? 0;
-        return this.getClassMappingsInPackage(currentPageNumber + 1)
-          .pipe(
-            map(additionalPage => {
-              return [...content, ...additionalPage];
-            })
-          );
-      }),
-      map(packages => {
-        if (packages === undefined) {
-          return [];
-        }
-
-        return packages;
-      }));
+  onClassSelected(mapping: Mapping) {
+    this.classSelected.emit(mapping);
   }
 }

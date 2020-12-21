@@ -31,6 +31,11 @@ import { PackageTreeSideNavComponent } from './package-tree-side-nav/package-tre
 import { TabbedSidenavDrawerComponent } from './tabbed-sidenav-drawer/tabbed-sidenav-drawer.component';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { ClassSelectorSideNavComponent } from './class-selector-side-nav/class-selector-side-nav.component';
+import { ClassViewerComponent } from './class-viewer/class-viewer.component';
+import {ClassNamePipe} from '../pipes/class-name/class-name.pipe';
+import { MethodViewerComponent } from './method-viewer/method-viewer.component';
+import { FieldViewerComponent } from './field-viewer/field-viewer.component';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 
 @NgModule({
@@ -48,28 +53,33 @@ import { ClassSelectorSideNavComponent } from './class-selector-side-nav/class-s
     ClassSelectorComponent,
     PackageTreeSideNavComponent,
     TabbedSidenavDrawerComponent,
-    ClassSelectorSideNavComponent
+    ClassSelectorSideNavComponent,
+    ClassViewerComponent,
+    ClassNamePipe,
+    MethodViewerComponent,
+    FieldViewerComponent
   ],
-    imports: [
-        CommonModule,
-        MatButtonModule,
-        MatSelectModule,
-        MatMenuModule,
-        MatInputModule,
-        ReactiveFormsModule,
-        MatAutocompleteModule,
-        MatToolbarModule,
-        RouterModule,
-        MatIconModule,
-        MatTreeModule,
-        MatCardModule,
-        MatDialogModule,
-        MatProgressBarModule,
-        MatProgressSpinnerModule,
-        ScrollingModule,
-        MatListModule,
-        MatSidenavModule
-    ],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatSelectModule,
+    MatMenuModule,
+    MatInputModule,
+    ReactiveFormsModule,
+    MatAutocompleteModule,
+    MatToolbarModule,
+    RouterModule,
+    MatIconModule,
+    MatTreeModule,
+    MatCardModule,
+    MatDialogModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    ScrollingModule,
+    MatListModule,
+    MatSidenavModule,
+    MatTooltipModule
+  ],
   exports: [
     GameVersionsSelectorComponent,
     ThemeSelectorComponent,
@@ -81,7 +91,9 @@ import { ClassSelectorSideNavComponent } from './class-selector-side-nav/class-s
     MappingFiltersSelectorComponent,
     ClassSelectorComponent,
     PackageTreeSideNavComponent,
-    ClassSelectorSideNavComponent
+    ClassSelectorSideNavComponent,
+    ClassNamePipe,
+    ClassViewerComponent
   ],
   entryComponents: [
     SignedInMenuComponent,

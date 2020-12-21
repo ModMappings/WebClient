@@ -19,12 +19,12 @@ export interface PageMappable {
     totalPages?: number;
     size?: number;
     content?: Array<Mappable>;
+    number?: number;
     sort?: Sort;
     numberOfElements?: number;
     first?: boolean;
     pageable?: Pageable;
     last?: boolean;
-    number?: number;
     empty?: boolean;
 }
 

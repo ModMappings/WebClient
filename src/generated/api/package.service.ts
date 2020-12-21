@@ -23,6 +23,25 @@ import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables'
 import { Configuration }                                     from '../configuration';
 
 
+export interface GetPackagesBySearchCriteriaRequestParams {
+    /** The id of the game version to get the package for. */
+    gameVersion?: string;
+    /** The id of the release to get the package for. */
+    release?: string;
+    /** The id of the mapping type to get the package for. */
+    mappingType?: string;
+    /** The regex to match the input mapping of the packages against. Either this or the output variant needs to be specified. */
+    inputMatchingRegex?: string;
+    /** The regex to match the output mapping of the packages against. Either this or the input variant needs to be specified. */
+    outputMatchingRegex?: string;
+    /** Zero-based page index (0..N) */
+    page?: number;
+    /** The size of the page to be returned */
+    size?: number;
+    /** Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+    sort?: Array<string>;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -87,21 +106,22 @@ export class PackageService {
 
     /**
      * Gets all known packages that match the given parameters.
-     * @param gameVersion The id of the game version to get the package for.
-     * @param release The id of the release to get the package for.
-     * @param mappingType The id of the mapping type to get the package for.
-     * @param inputMatchingRegex The regex to match the input mapping of the packages against. Either this or the output variant needs to be specified.
-     * @param outputMatchingRegex The regex to match the output mapping of the packages against. Either this or the input variant needs to be specified.
-     * @param page Zero-based page index (0..N)
-     * @param size The size of the page to be returned
-     * @param sort Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getPackagesBySearchCriteria(gameVersion?: string, release?: string, mappingType?: string, inputMatchingRegex?: string, outputMatchingRegex?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<PageString>;
-    public getPackagesBySearchCriteria(gameVersion?: string, release?: string, mappingType?: string, inputMatchingRegex?: string, outputMatchingRegex?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpResponse<PageString>>;
-    public getPackagesBySearchCriteria(gameVersion?: string, release?: string, mappingType?: string, inputMatchingRegex?: string, outputMatchingRegex?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpEvent<PageString>>;
-    public getPackagesBySearchCriteria(gameVersion?: string, release?: string, mappingType?: string, inputMatchingRegex?: string, outputMatchingRegex?: string, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<any> {
+    public getPackagesBySearchCriteria(requestParameters: GetPackagesBySearchCriteriaRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<PageString>;
+    public getPackagesBySearchCriteria(requestParameters: GetPackagesBySearchCriteriaRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<PageString>>;
+    public getPackagesBySearchCriteria(requestParameters: GetPackagesBySearchCriteriaRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<PageString>>;
+    public getPackagesBySearchCriteria(requestParameters: GetPackagesBySearchCriteriaRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const gameVersion = requestParameters.gameVersion;
+        const release = requestParameters.release;
+        const mappingType = requestParameters.mappingType;
+        const inputMatchingRegex = requestParameters.inputMatchingRegex;
+        const outputMatchingRegex = requestParameters.outputMatchingRegex;
+        const page = requestParameters.page;
+        const size = requestParameters.size;
+        const sort = requestParameters.sort;
 
         let queryParameters = new HttpParams({encoder: this.encoder});
         if (gameVersion !== undefined && gameVersion !== null) {
@@ -145,7 +165,6 @@ export class PackageService {
         if (httpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
-                'text/event-stream',
                 'application/json'
             ];
             httpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);

@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {
   GameVersion,
-  GameVersionsService,
+  GameVersionsService, Mapping,
   MappingsService,
   MappingType,
   MappingTypesService,
@@ -11,6 +11,7 @@ import {
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {distinct, filter, map, mergeMap, tap} from 'rxjs/operators';
 import {SelectedMappingFilters} from '../../util/selected-mappings-filter';
+import {getAllPages} from '../../util/observable-functions';
 
 @Component({
   selector: 'app-mapping-filters-selector',
@@ -31,6 +32,9 @@ export class MappingFiltersSelectorComponent implements OnInit, AfterViewInit {
   mappingTypeControl: FormControl;
   selectionFormGroup: FormGroup;
 
+  selectedGameVersion: GameVersion | null;
+  selectedMappingType: MappingType | null;
+
   constructor(
     private mappingTypesService: MappingTypesService,
     private gameVersionsService: GameVersionsService,
@@ -48,15 +52,23 @@ export class MappingFiltersSelectorComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.gameVersionsService.getGameVersionsBySearchCriteria().subscribe(page => {
-      this.gameVersions = page?.content ?? [];
-      this.gameVersionControl.enable();
-    });
+    this.gameVersionsService.getGameVersionsBySearchCriteria({})
+      .pipe(
+        getAllPages(pageIndex => this.gameVersionsService.getGameVersionsBySearchCriteria({page: pageIndex}))
+      )
+      .subscribe(gameVersions => {
+        this.gameVersions = gameVersions;
+        this.gameVersionControl.enable();
+      });
 
-    this.mappingTypesService.getMappingTypesBySearchCriteria().subscribe(pmt => {
-      this.mappingTypes = pmt?.content ?? [];
-      this.mappingTypeControl.enable();
-    });
+    this.mappingTypesService.getMappingTypesBySearchCriteria({})
+      .pipe(
+        getAllPages(pageIndex => this.mappingTypesService.getMappingTypesBySearchCriteria({page: pageIndex}))
+      )
+      .subscribe(mappingTypes => {
+        this.mappingTypes = mappingTypes;
+        this.mappingTypeControl.enable();
+      });
   }
 
   ngAfterViewInit(): void {
@@ -73,17 +85,24 @@ export class MappingFiltersSelectorComponent implements OnInit, AfterViewInit {
         mappingType: value.mappingType as MappingType | null
       })),
       distinct(),
-      mergeMap(releaseFilterData => this.releasesService.getReleasesBySearchCriteria(
-        undefined,
-        releaseFilterData.gameVersion?.id,
-        releaseFilterData.mappingType?.id,
-        true,
-        undefined,
-        undefined,
-        0,
-        10000
-      )),
-      map(releasePage => releasePage.content ?? [])
+      filter(data => data.mappingType != this.selectedMappingType || data.gameVersion != this.selectedGameVersion),
+      tap(data => {
+        this.selectedMappingType = data.mappingType;
+        this.selectedGameVersion = data.gameVersion;
+      }),
+      mergeMap(releaseFilterData => this.releasesService.getReleasesBySearchCriteria({
+          gameVersion: releaseFilterData.gameVersion?.id,
+          mappingType: releaseFilterData.mappingType?.id,
+        }
+        ).pipe(
+        getAllPages(pageIndex => this.releasesService.getReleasesBySearchCriteria({
+            gameVersion: releaseFilterData.gameVersion?.id,
+            mappingType: releaseFilterData.mappingType?.id,
+            page: pageIndex
+          }
+        ))
+        )
+      ),
     ).subscribe(releases => {
       this.releases = releases;
       this.releaseControl.setValue(null, {emitEvent: false, emitModelToViewChange: true, emitViewToModelChange: true});

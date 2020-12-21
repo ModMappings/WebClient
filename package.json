@@ -9,7 +9,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "postinstall": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points",
-    "generate-api": "openapi-generator generate -g typescript-angular -i http://localhost:8080/v3/api-docs/ -o src/generated --skip-validate-spec"
+    "generate-api": "openapi-generator generate -g typescript-angular -i http://localhost:8080/v3/api-docs/ -o src/generated --skip-validate-spec --additional-properties=useSingleRequestParameter=true"
   },
   "private": true,
   "dependencies": {

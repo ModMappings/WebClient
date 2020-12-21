@@ -1,16 +1,8 @@
 import {Injectable} from '@angular/core';
-import {Observable, of} from 'rxjs';
-import {MappableType, MappingsService, PackageService, VersionedMappablesService} from '../../generated';
-import {delay, filter, flatMap, map, mergeMap} from 'rxjs/operators';
-import {angularLifecycleMethodKeys} from 'codelyzer/util/utils';
-
-function randomString(length: number, chars: string): string {
-  let result = '';
-  for (let i = length; i > 0; --i) {
-    result += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return result;
-}
+import {Observable} from 'rxjs';
+import {PackageService} from '../../generated';
+import {getAllPages} from '../util/observable-functions';
+import {map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -47,46 +39,34 @@ export class PackageManagementService {
   }
 
   getPackagesWithRegex(
-    outputRegex: string,
-    gameVersionId?: string,
-    mappingTypeId?: string,
-    releaseId?: string,
+    outputMatchingRegex: string,
+    gameVersion?: string,
+    mappingType?: string,
+    release?: string,
     page?: number
   ): Observable<string[]> {
     if (page == null) {
       page = 0;
     }
 
-    return this.apiPackageService.getPackagesBySearchCriteria(
-      gameVersionId,
-      releaseId,
-      mappingTypeId,
-      undefined,
-      outputRegex,
-      page
+    return this.apiPackageService.getPackagesBySearchCriteria( {
+       gameVersion,
+       release,
+       mappingType,
+       outputMatchingRegex,
+       page
+    }
     ).pipe(
-      mergeMap((pulledPage) => {
-        if (pulledPage.last) {
-          return of(pulledPage.content);
-        }
-
-        const current = pulledPage.content ?? [];
-        return this.getPackagesWithRegex(
-          outputRegex, gameVersionId, mappingTypeId, releaseId, (pulledPage.number ?? -1) + 1
-        )
-          .pipe(
-            map(packageToAppend => {
-              return [...current, ...packageToAppend];
-            })
-          );
+      getAllPages((page) => {
+        return this.apiPackageService.getPackagesBySearchCriteria({
+          gameVersion,
+          release,
+          mappingType,
+          outputMatchingRegex,
+          page
+        });
       }),
-      map(packages => {
-        if (packages === undefined) {
-          return [];
-        }
-
-        return packages;
-      })
+      map(packages => packages.sort())
     );
   }
 

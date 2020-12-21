@@ -25,6 +25,46 @@ import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables'
 import { Configuration }                                     from '../configuration';
 
 
+export interface GetVersionedMappableByIdRequestParams {
+    /** The id of the versioned mappable to look up. */
+    id: string;
+}
+
+export interface GetVersionedMappablesBySearchCriteriaRequestParams {
+    /** The id of the game version. Null to ignore. */
+    gameVersionId?: string;
+    /** The type of the mappable to look up. Null to ignore. */
+    mappableType?: MappableType;
+    /** The id of the class to find versioned mappables in. Null to ignore. */
+    classId?: string;
+    /** The id of the method to find versioned mappables in. Null to ignore. */
+    methodId?: string;
+    /** The id of the mapping to find the versioned mappables for. Null to ignore. If parameter is passed, either a single result is returned or none. Since each mapping can only target a single versioned mappable. */
+    mappingId?: string;
+    /** The id of the mapping type to find the versioned mappables for. Null to ignore. Use full in combination with a input and output regex. */
+    mappingTypeId?: string;
+    /** A regex that is mapped against the input of the mapping. Null to ignore */
+    mappingInputRegex?: string;
+    /** A regex that is mapped against the output of the mapping. Null to ignore */
+    mappingOutputRegex?: string;
+    /** The id of the class to find the super types for. Null to ignore. */
+    superTypeTargetId?: string;
+    /** The id of the class to find the sub types for. Null to ignore. */
+    subTypeTargetId?: string;
+    /** Zero-based page index (0..N) */
+    page?: number;
+    /** The size of the page to be returned */
+    size?: number;
+    /** Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+    sort?: Array<string>;
+}
+
+export interface UpdateVersionedMappableRequestParams {
+    /** The id of the versioned mappable to update. */
+    id: string;
+    versionedMappable?: VersionedMappable;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -89,14 +129,15 @@ export class VersionedMappablesService {
 
     /**
      * Looks up a versioned mappable using a given id.
-     * @param id The id of the versioned mappable to look up.
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getVersionedMappableById(id: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<VersionedMappable>;
-    public getVersionedMappableById(id: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<VersionedMappable>>;
-    public getVersionedMappableById(id: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<VersionedMappable>>;
-    public getVersionedMappableById(id: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+    public getVersionedMappableById(requestParameters: GetVersionedMappableByIdRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<VersionedMappable>;
+    public getVersionedMappableById(requestParameters: GetVersionedMappableByIdRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<VersionedMappable>>;
+    public getVersionedMappableById(requestParameters: GetVersionedMappableByIdRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<VersionedMappable>>;
+    public getVersionedMappableById(requestParameters: GetVersionedMappableByIdRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const id = requestParameters.id;
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getVersionedMappableById.');
         }
@@ -134,26 +175,27 @@ export class VersionedMappablesService {
 
     /**
      * Gets all known versioned mappables that match the given parameters.
-     * @param gameVersionId The id of the game version. Null to ignore.
-     * @param mappableType The type of the mappable to look up. Null to ignore.
-     * @param classId The id of the class to find versioned mappables in. Null to ignore.
-     * @param methodId The id of the method to find versioned mappables in. Null to ignore.
-     * @param mappingId The id of the mapping to find the versioned mappables for. Null to ignore. If parameter is passed, either a single result is returned or none. Since each mapping can only target a single versioned mappable.
-     * @param mappingTypeId The id of the mapping type to find the versioned mappables for. Null to ignore. Use full in combination with a input and output regex.
-     * @param mappingInputRegex A regex that is mapped against the input of the mapping. Null to ignore
-     * @param mappingOutputRegex A regex that is mapped against the output of the mapping. Null to ignore
-     * @param superTypeTargetId The id of the class to find the super types for. Null to ignore.
-     * @param subTypeTargetId The id of the class to find the sub types for. Null to ignore.
-     * @param page Zero-based page index (0..N)
-     * @param size The size of the page to be returned
-     * @param sort Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getVersionedMappablesBySearchCriteria(gameVersionId?: string, mappableType?: MappableType, classId?: string, methodId?: string, mappingId?: string, mappingTypeId?: string, mappingInputRegex?: string, mappingOutputRegex?: string, superTypeTargetId?: string, subTypeTargetId?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<PageVersionedMappable>;
-    public getVersionedMappablesBySearchCriteria(gameVersionId?: string, mappableType?: MappableType, classId?: string, methodId?: string, mappingId?: string, mappingTypeId?: string, mappingInputRegex?: string, mappingOutputRegex?: string, superTypeTargetId?: string, subTypeTargetId?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpResponse<PageVersionedMappable>>;
-    public getVersionedMappablesBySearchCriteria(gameVersionId?: string, mappableType?: MappableType, classId?: string, methodId?: string, mappingId?: string, mappingTypeId?: string, mappingInputRegex?: string, mappingOutputRegex?: string, superTypeTargetId?: string, subTypeTargetId?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpEvent<PageVersionedMappable>>;
-    public getVersionedMappablesBySearchCriteria(gameVersionId?: string, mappableType?: MappableType, classId?: string, methodId?: string, mappingId?: string, mappingTypeId?: string, mappingInputRegex?: string, mappingOutputRegex?: string, superTypeTargetId?: string, subTypeTargetId?: string, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<any> {
+    public getVersionedMappablesBySearchCriteria(requestParameters: GetVersionedMappablesBySearchCriteriaRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<PageVersionedMappable>;
+    public getVersionedMappablesBySearchCriteria(requestParameters: GetVersionedMappablesBySearchCriteriaRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<PageVersionedMappable>>;
+    public getVersionedMappablesBySearchCriteria(requestParameters: GetVersionedMappablesBySearchCriteriaRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<PageVersionedMappable>>;
+    public getVersionedMappablesBySearchCriteria(requestParameters: GetVersionedMappablesBySearchCriteriaRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const gameVersionId = requestParameters.gameVersionId;
+        const mappableType = requestParameters.mappableType;
+        const classId = requestParameters.classId;
+        const methodId = requestParameters.methodId;
+        const mappingId = requestParameters.mappingId;
+        const mappingTypeId = requestParameters.mappingTypeId;
+        const mappingInputRegex = requestParameters.mappingInputRegex;
+        const mappingOutputRegex = requestParameters.mappingOutputRegex;
+        const superTypeTargetId = requestParameters.superTypeTargetId;
+        const subTypeTargetId = requestParameters.subTypeTargetId;
+        const page = requestParameters.page;
+        const size = requestParameters.size;
+        const sort = requestParameters.sort;
 
         let queryParameters = new HttpParams({encoder: this.encoder});
         if (gameVersionId !== undefined && gameVersionId !== null) {
@@ -217,7 +259,6 @@ export class VersionedMappablesService {
         if (httpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
-                'text/event-stream',
                 'application/json'
             ];
             httpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
@@ -247,18 +288,19 @@ export class VersionedMappablesService {
     /**
      * Updates, but does not create, the versioned mappable from the data in the request body.
      * This converts the data in the request body into a full versioned mappable, then updates the versioned mappable with the given id, and stores the updated versioned mappable in the database. A user needs to be authorized to perform this request. A user needs to have the role \&#39;VERSIONED_MAPPABLES_UPDATE\&#39; to execute this action successfully.
-     * @param id The id of the versioned mappable to update.
-     * @param versionedMappable 
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public updateVersionedMappable(id: string, versionedMappable?: VersionedMappable, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<VersionedMappable>;
-    public updateVersionedMappable(id: string, versionedMappable?: VersionedMappable, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<VersionedMappable>>;
-    public updateVersionedMappable(id: string, versionedMappable?: VersionedMappable, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<VersionedMappable>>;
-    public updateVersionedMappable(id: string, versionedMappable?: VersionedMappable, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+    public updateVersionedMappable(requestParameters: UpdateVersionedMappableRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<VersionedMappable>;
+    public updateVersionedMappable(requestParameters: UpdateVersionedMappableRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<VersionedMappable>>;
+    public updateVersionedMappable(requestParameters: UpdateVersionedMappableRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<VersionedMappable>>;
+    public updateVersionedMappable(requestParameters: UpdateVersionedMappableRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const id = requestParameters.id;
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateVersionedMappable.');
         }
+        const versionedMappable = requestParameters.versionedMappable;
 
         let headers = this.defaultHeaders;
 

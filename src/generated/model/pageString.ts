@@ -18,12 +18,12 @@ export interface PageString {
     totalPages?: number;
     size?: number;
     content?: Array<string>;
+    number?: number;
     sort?: Sort;
     numberOfElements?: number;
     first?: boolean;
     pageable?: Pageable;
     last?: boolean;
-    number?: number;
     empty?: boolean;
 }
 

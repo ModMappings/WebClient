@@ -17,6 +17,7 @@ import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {combineLatest, merge, Subject} from 'rxjs';
 import {MatSort, Sort} from '@angular/material/sort';
 import {quoteRegex} from '../../../util/quote-regex';
+import {getAllPages} from '../../../util/observable-functions';
 
 const packages = [
   'com/mojang/blaze3d',
@@ -256,15 +257,23 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.gameVersionsService.getGameVersionsBySearchCriteria().subscribe(page => {
-      this.gameVersions = page?.content ?? [];
-      this.gameVersionControl.enable();
-    });
+    this.gameVersionsService.getGameVersionsBySearchCriteria({})
+      .pipe(
+        getAllPages(pageIndex => this.gameVersionsService.getGameVersionsBySearchCriteria({page: pageIndex}))
+      )
+      .subscribe(gameVersions => {
+        this.gameVersions = gameVersions;
+        this.gameVersionControl.enable();
+      });
 
-    this.mappingTypesService.getMappingTypesBySearchCriteria().subscribe(pmt => {
-      this.mappingTypes = pmt?.content ?? [];
-      this.mappingTypeControl.enable();
-    });
+    this.mappingTypesService.getMappingTypesBySearchCriteria({})
+      .pipe(
+        getAllPages(pageIndex => this.mappingTypesService.getMappingTypesBySearchCriteria({page: pageIndex}))
+      )
+      .subscribe(mappingTypes => {
+        this.mappingTypes = mappingTypes;
+        this.mappingTypeControl.enable();
+      });
   }
 
   ngAfterViewInit() {
@@ -311,9 +320,15 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         const sort = active ? [`${active},${direction}`] : undefined;
         this.mappingsLoading = true;
         return this.mappingsService.getMappingsBySearchCriteria(
-          undefined, undefined, undefined, MappableType.CLASS,
-          undefined, searchValue === '' ? undefined : '(?i)' + quoteRegex(searchValue),
-          mappingType?.id, gameVersion?.id, undefined, pageIndex, pageSize, sort
+          {
+            mappableType: MappableType.CLASS,
+            mappingTypeId: mappingType?.id,
+            gameVersionId: gameVersion?.id,
+            outputRegex: searchValue === '' ? undefined : '(?i)' + quoteRegex(searchValue),
+            page: pageIndex,
+            size: pageSize,
+            sort: sort
+          }
         );
       })
     ).subscribe(page => {

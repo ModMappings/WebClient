@@ -1,5 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {SelectedMappingFilters} from '../../util/selected-mappings-filter';
+import {Mapping} from '../../../generated';
 
 @Component({
   selector: 'app-class-selector-side-nav',
@@ -15,7 +16,7 @@ export class ClassSelectorSideNavComponent implements OnInit {
   selectionFilters: SelectedMappingFilters | null = null;
 
   @Output()
-  classSelected: EventEmitter<string> = new EventEmitter<string>();
+  classSelected: EventEmitter<Mapping> = new EventEmitter<Mapping>();
 
   constructor() { }
 

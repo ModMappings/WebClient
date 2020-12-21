@@ -1,0 +1,14 @@
+<div class="w-100 h-100" *ngIf="canDisplay()">
+  <div class="d-flex flex-row">
+    <h3 matTooltip="{{mapping.mappingDTO.documentation}}">{{mapping?.mappingDTO.output}}</h3>
+  </div>
+  <div class="pl-2">
+    <h5 *ngIf="!loadingParameters && parameters.length > 0">Parameters:</h5>
+    <span *ngIf="loadingParameters">Loading parameters...</span>
+    <div class="w-100" *ngIf="!loadingParameters">
+      <div class="w-100 p-1 pl-2" *ngFor="let parameter of parameters">
+        <span matTooltip="{{parameter.mappingDTO.documentation}}">{{parameter.mappingDTO.output}}</span>
+      </div>
+    </div>
+  </div>
+</div>

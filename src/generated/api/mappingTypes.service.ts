@@ -24,6 +24,24 @@ import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables'
 import { Configuration }                                     from '../configuration';
 
 
+export interface GetMappingTypeByIdRequestParams {
+    /** The id of the mapping type to look up. */
+    id: string;
+}
+
+export interface GetMappingTypesBySearchCriteriaRequestParams {
+    /** The regular expression to match the name of the mapping type against. */
+    name?: string;
+    /** Indicator if filtering on editable is needed or not. Leave the parameter out if you do not care for filtering on editable. */
+    editable?: boolean;
+    /** Zero-based page index (0..N) */
+    page?: number;
+    /** The size of the page to be returned */
+    size?: number;
+    /** Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+    sort?: Array<string>;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -88,14 +106,15 @@ export class MappingTypesService {
 
     /**
      * Looks up a mapping type using a given id.
-     * @param id The id of the mapping type to look up.
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getMappingTypeById(id: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<MappingType>;
-    public getMappingTypeById(id: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<MappingType>>;
-    public getMappingTypeById(id: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<MappingType>>;
-    public getMappingTypeById(id: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+    public getMappingTypeById(requestParameters: GetMappingTypeByIdRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<MappingType>;
+    public getMappingTypeById(requestParameters: GetMappingTypeByIdRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<MappingType>>;
+    public getMappingTypeById(requestParameters: GetMappingTypeByIdRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<MappingType>>;
+    public getMappingTypeById(requestParameters: GetMappingTypeByIdRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const id = requestParameters.id;
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getMappingTypeById.');
         }
@@ -133,18 +152,19 @@ export class MappingTypesService {
 
     /**
      * Gets all known mapping types and finds the ones that match the given parameters.
-     * @param name The regular expression to match the name of the mapping type against.
-     * @param editable Indicator if filtering on editable is needed or not. Leave the parameter out if you do not care for filtering on editable.
-     * @param page Zero-based page index (0..N)
-     * @param size The size of the page to be returned
-     * @param sort Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getMappingTypesBySearchCriteria(name?: string, editable?: boolean, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<PageMappingType>;
-    public getMappingTypesBySearchCriteria(name?: string, editable?: boolean, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpResponse<PageMappingType>>;
-    public getMappingTypesBySearchCriteria(name?: string, editable?: boolean, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpEvent<PageMappingType>>;
-    public getMappingTypesBySearchCriteria(name?: string, editable?: boolean, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<any> {
+    public getMappingTypesBySearchCriteria(requestParameters: GetMappingTypesBySearchCriteriaRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<PageMappingType>;
+    public getMappingTypesBySearchCriteria(requestParameters: GetMappingTypesBySearchCriteriaRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<PageMappingType>>;
+    public getMappingTypesBySearchCriteria(requestParameters: GetMappingTypesBySearchCriteriaRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<PageMappingType>>;
+    public getMappingTypesBySearchCriteria(requestParameters: GetMappingTypesBySearchCriteriaRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const name = requestParameters.name;
+        const editable = requestParameters.editable;
+        const page = requestParameters.page;
+        const size = requestParameters.size;
+        const sort = requestParameters.sort;
 
         let queryParameters = new HttpParams({encoder: this.encoder});
         if (name !== undefined && name !== null) {
@@ -176,7 +196,6 @@ export class MappingTypesService {
         if (httpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
-                'text/event-stream',
                 'application/json'
             ];
             httpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);

@@ -19,12 +19,12 @@ export interface PageGameVersion {
     totalPages?: number;
     size?: number;
     content?: Array<GameVersion>;
+    number?: number;
     sort?: Sort;
     numberOfElements?: number;
     first?: boolean;
     pageable?: Pageable;
     last?: boolean;
-    number?: number;
     empty?: boolean;
 }
 

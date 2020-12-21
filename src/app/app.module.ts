@@ -15,6 +15,7 @@ import {AuthModule, OidcConfigService, OidcSecurityService, OpenIdConfiguration}
 import {environment} from '../environments/environment';
 import {AddOidcTokenInterceptor} from './services/add-oidc-token.interceptor';
 import {BASE_PATH} from '../generated';
+import { ClassNamePipe } from './pipes/class-name/class-name.pipe';
 
 export function loadOidcConfig(service: OidcConfigService) {
   return async () => {

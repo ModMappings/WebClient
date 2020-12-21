@@ -1,12 +1,12 @@
 <div class="d-flex flex-column h-100">
   <div class="heading">
-    Class selector
+    Select a class:
   </div>
 
   <mat-list dense class="flex-grow-1 overflow-auto">
-    <ng-container *ngFor="let clz of selectedClasses">
-      <mat-list-item>
-        <span> {{clz}} </span>
+    <ng-container *ngFor="let clz of selectableClasses">
+      <mat-list-item (click)="onClassSelected(clz)">
+        <div> {{clz | className}} </div>
       </mat-list-item>
     </ng-container>
   </mat-list>

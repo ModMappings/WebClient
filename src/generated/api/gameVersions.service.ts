@@ -24,6 +24,26 @@ import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables'
 import { Configuration }                                     from '../configuration';
 
 
+export interface GetGameVersionByIdRequestParams {
+    /** The id of the game version to look up. */
+    id: string;
+}
+
+export interface GetGameVersionsBySearchCriteriaRequestParams {
+    /** The regular expression to match the name of the version against. */
+    name?: string;
+    /** Indicator if filtering on pre-releases is needed or not. Leave the parameter out if you do not care for filtering on pre-releases or not. */
+    preRelease?: boolean;
+    /** Indicator if filtering on snapshots is needed or not. Leave the parameter out if you do not care for filtering on snapshots or not. */
+    snapshot?: boolean;
+    /** Zero-based page index (0..N) */
+    page?: number;
+    /** The size of the page to be returned */
+    size?: number;
+    /** Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+    sort?: Array<string>;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -88,14 +108,15 @@ export class GameVersionsService {
 
     /**
      * Looks up a game version using a given id.
-     * @param id The id of the game version to look up.
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getGameVersionById(id: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<GameVersion>;
-    public getGameVersionById(id: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<GameVersion>>;
-    public getGameVersionById(id: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<GameVersion>>;
-    public getGameVersionById(id: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+    public getGameVersionById(requestParameters: GetGameVersionByIdRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<GameVersion>;
+    public getGameVersionById(requestParameters: GetGameVersionByIdRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<GameVersion>>;
+    public getGameVersionById(requestParameters: GetGameVersionByIdRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<GameVersion>>;
+    public getGameVersionById(requestParameters: GetGameVersionByIdRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const id = requestParameters.id;
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getGameVersionById.');
         }
@@ -133,19 +154,20 @@ export class GameVersionsService {
 
     /**
      * Gets all known game versions and finds the ones that match the given parameters.
-     * @param name The regular expression to match the name of the version against.
-     * @param preRelease Indicator if filtering on pre-releases is needed or not. Leave the parameter out if you do not care for filtering on pre-releases or not.
-     * @param snapshot Indicator if filtering on snapshots is needed or not. Leave the parameter out if you do not care for filtering on snapshots or not.
-     * @param page Zero-based page index (0..N)
-     * @param size The size of the page to be returned
-     * @param sort Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getGameVersionsBySearchCriteria(name?: string, preRelease?: boolean, snapshot?: boolean, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<PageGameVersion>;
-    public getGameVersionsBySearchCriteria(name?: string, preRelease?: boolean, snapshot?: boolean, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpResponse<PageGameVersion>>;
-    public getGameVersionsBySearchCriteria(name?: string, preRelease?: boolean, snapshot?: boolean, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpEvent<PageGameVersion>>;
-    public getGameVersionsBySearchCriteria(name?: string, preRelease?: boolean, snapshot?: boolean, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<any> {
+    public getGameVersionsBySearchCriteria(requestParameters: GetGameVersionsBySearchCriteriaRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<PageGameVersion>;
+    public getGameVersionsBySearchCriteria(requestParameters: GetGameVersionsBySearchCriteriaRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<PageGameVersion>>;
+    public getGameVersionsBySearchCriteria(requestParameters: GetGameVersionsBySearchCriteriaRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<PageGameVersion>>;
+    public getGameVersionsBySearchCriteria(requestParameters: GetGameVersionsBySearchCriteriaRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const name = requestParameters.name;
+        const preRelease = requestParameters.preRelease;
+        const snapshot = requestParameters.snapshot;
+        const page = requestParameters.page;
+        const size = requestParameters.size;
+        const sort = requestParameters.sort;
 
         let queryParameters = new HttpParams({encoder: this.encoder});
         if (name !== undefined && name !== null) {
@@ -181,7 +203,6 @@ export class GameVersionsService {
         if (httpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
-                'text/event-stream',
                 'application/json'
             ];
             httpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);

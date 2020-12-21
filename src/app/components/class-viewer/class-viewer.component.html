@@ -1,0 +1,23 @@
+<div class="w-100 h-100" *ngIf="canDisplay()">
+  <div class="d-flex flex-row">
+    <h2 matTooltip="{{mapping.mappingDTO.documentation}}">{{mapping?.mappingDTO | className}}</h2>
+  </div>
+  <div class="pl-2">
+    <h3 *ngIf="!loadingMethods && methods.length > 0">Methods:</h3>
+    <span *ngIf="loadingMethods">Loading methods...</span>
+    <div class="w-100" *ngIf="!loadingMethods">
+      <div class="w-100 p-1 pl-3" *ngFor="let method of methods">
+        <app-method-viewer [selectionFilters]="selectionFilters" [mapping]="method"></app-method-viewer>
+      </div>
+    </div>
+  </div>
+  <div class="pl-2">
+    <h3 *ngIf="!loadingFields && fields.length > 0">Fields:</h3>
+    <span *ngIf="loadingFields">Loading fields...</span>
+    <div class="w-100" *ngIf="!loadingFields">
+      <div class="w-100 p-1 pl-3" *ngFor="let field of fields">
+        <app-field-viewer [selectionFilters]="selectionFilters" [mapping]="field"></app-field-viewer>
+      </div>
+    </div>
+  </div>
+</div>

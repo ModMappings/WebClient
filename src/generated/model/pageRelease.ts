@@ -19,12 +19,12 @@ export interface PageRelease {
     totalPages?: number;
     size?: number;
     content?: Array<Release>;
+    number?: number;
     sort?: Sort;
     numberOfElements?: number;
     first?: boolean;
     pageable?: Pageable;
     last?: boolean;
-    number?: number;
     empty?: boolean;
 }
 

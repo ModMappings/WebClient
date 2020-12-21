@@ -4,6 +4,8 @@
   </div>
 
   <app-package-tree-side-nav class="w-100 h-100 flex-grow-1" [selectionFilters]="selectedFilters" (packageSelected)="onPackageSelected($event)">
-    <app-class-selector-side-nav content class="h-100" [selectionFilters]="selectedFilters" [packageName]="selectedPackage"></app-class-selector-side-nav>
+    <app-class-selector-side-nav content class="h-100" [selectionFilters]="selectedFilters" [packageName]="selectedPackage" (classSelected)="onClassSelected($event)">
+      <app-class-viewer content class="w-100 h-100" [selectionFilters]="selectedFilters" [mapping]="selectedClass" *ngIf="selectedClass != null"></app-class-viewer>
+    </app-class-selector-side-nav>
   </app-package-tree-side-nav>
 </div>

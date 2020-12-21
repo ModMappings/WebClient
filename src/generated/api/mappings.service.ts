@@ -17,6 +17,7 @@ import { HttpClient, HttpHeaders, HttpParams,
 import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
+import { DetailedMapping } from '../model/models';
 import { MappableType } from '../model/models';
 import { Mapping } from '../model/models';
 import { PageDetailedMapping } from '../model/models';
@@ -25,6 +26,84 @@ import { PageMapping } from '../model/models';
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
+
+export interface CreateMappingRequestParams {
+    versionedMappable: string;
+    mappingType: string;
+    mapping?: Mapping;
+}
+
+export interface GetDetailedMappingByIdRequestParams {
+    /** The id of the mapping to look up. */
+    id: string;
+}
+
+export interface GetDetailedMappingsBySearchCriteriaRequestParams {
+    /** Indicates if only latest mappings for a given versioned mappable should be taken into account. Defaults to true if not supplied. */
+    latestOnly?: boolean;
+    /** The id of the versioned mappable to filter on. */
+    versionedMappableId?: string;
+    /** The id of the release to filter on. */
+    releaseId?: string;
+    /** The mappable type to filter on. */
+    mappableType?: MappableType;
+    /** The regular expression to match the input of the mapping against. */
+    inputRegex?: string;
+    /** The regular expression to match the output of the mapping against. */
+    outputRegex?: string;
+    /** The id of the mapping type to filter on. */
+    mappingTypeId?: string;
+    /** The id of the game version to filter on. */
+    gameVersionId?: string;
+    /** The id of the user who created a mapping to filter on. */
+    createdBy?: string;
+    /** The id of the class of which the targeted mappings versioned mappable resides in. */
+    parentClassId?: string;
+    /** The id of the method of which the targeted mappings versioned mappable resides in. */
+    parentMethodId?: string;
+    /** Zero-based page index (0..N) */
+    page?: number;
+    /** The size of the page to be returned */
+    size?: number;
+    /** Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+    sort?: Array<string>;
+}
+
+export interface GetMappingsByIdRequestParams {
+    /** The id of the mapping to look up. */
+    id: string;
+}
+
+export interface GetMappingsBySearchCriteriaRequestParams {
+    /** Indicates if only latest mappings for a given versioned mappable should be taken into account. Defaults to true if not supplied. */
+    latestOnly?: boolean;
+    /** The id of the versioned mappable to filter on. */
+    versionedMappableId?: string;
+    /** The id of the release to filter on. */
+    releaseId?: string;
+    /** The mappable type to filter on. */
+    mappableType?: MappableType;
+    /** The regular expression to match the input of the mapping against. */
+    inputRegex?: string;
+    /** The regular expression to match the output of the mapping against. */
+    outputRegex?: string;
+    /** The id of the mapping type to filter on. */
+    mappingTypeId?: string;
+    /** The id of the game version to filter on. */
+    gameVersionId?: string;
+    /** The id of the user who created a mapping to filter on. */
+    createdBy?: string;
+    /** The id of the class of which the targeted mappings versioned mappable resides in. */
+    parentClassId?: string;
+    /** The id of the method of which the targeted mappings versioned mappable resides in. */
+    parentMethodId?: string;
+    /** Zero-based page index (0..N) */
+    page?: number;
+    /** The size of the page to be returned */
+    size?: number;
+    /** Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+    sort?: Array<string>;
+}
 
 
 @Injectable({
@@ -91,22 +170,23 @@ export class MappingsService {
     /**
      * Creates the mapping from the data in the request body.
      * This converts the data in the request body into a full mapping, and stores it in the database. The components of this mapping are populated from the latest available mappings in the given mapping type and game version. The name of the mapping can not already be in use. A user needs to be authorized to perform this request. A user needs to have the role \&#39;MAPPINGS_CREATE\&#39; to execute this action successfully.
-     * @param versionedMappable 
-     * @param mappingType 
-     * @param mapping 
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createMapping(versionedMappable: string, mappingType: string, mapping?: Mapping, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<Mapping>;
-    public createMapping(versionedMappable: string, mappingType: string, mapping?: Mapping, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<Mapping>>;
-    public createMapping(versionedMappable: string, mappingType: string, mapping?: Mapping, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<Mapping>>;
-    public createMapping(versionedMappable: string, mappingType: string, mapping?: Mapping, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+    public createMapping(requestParameters: CreateMappingRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<Mapping>;
+    public createMapping(requestParameters: CreateMappingRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<Mapping>>;
+    public createMapping(requestParameters: CreateMappingRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<Mapping>>;
+    public createMapping(requestParameters: CreateMappingRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const versionedMappable = requestParameters.versionedMappable;
         if (versionedMappable === null || versionedMappable === undefined) {
             throw new Error('Required parameter versionedMappable was null or undefined when calling createMapping.');
         }
+        const mappingType = requestParameters.mappingType;
         if (mappingType === null || mappingType === undefined) {
             throw new Error('Required parameter mappingType was null or undefined when calling createMapping.');
         }
+        const mapping = requestParameters.mapping;
 
         let headers = this.defaultHeaders;
 
@@ -158,26 +238,75 @@ export class MappingsService {
     }
 
     /**
-     * Gets all known mappings, and their metadata, and finds the ones that match the given parameters.
-     * @param latestOnly Indicates if only latest mappings for a given versioned mappable should be taken into account. Defaults to true if not supplied.
-     * @param versionedMappableId The id of the versioned mappable to filter on.
-     * @param releaseId The id of the release to filter on.
-     * @param mappableType The mappable type to filter on.
-     * @param inputRegex The regular expression to match the input of the mapping against.
-     * @param outputRegex The regular expression to match the output of the mapping against.
-     * @param mappingTypeId The id of the mapping type to filter on.
-     * @param gameVersionId The id of the game version to filter on.
-     * @param createdBy The id of the user who created a mapping to filter on.
-     * @param page Zero-based page index (0..N)
-     * @param size The size of the page to be returned
-     * @param sort Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * Looks up a detailed mapping using a given id.
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getDetailedMappingsBySearchCriteria(latestOnly?: boolean, versionedMappableId?: string, releaseId?: string, mappableType?: MappableType, inputRegex?: string, outputRegex?: string, mappingTypeId?: string, gameVersionId?: string, createdBy?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<PageDetailedMapping>;
-    public getDetailedMappingsBySearchCriteria(latestOnly?: boolean, versionedMappableId?: string, releaseId?: string, mappableType?: MappableType, inputRegex?: string, outputRegex?: string, mappingTypeId?: string, gameVersionId?: string, createdBy?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpResponse<PageDetailedMapping>>;
-    public getDetailedMappingsBySearchCriteria(latestOnly?: boolean, versionedMappableId?: string, releaseId?: string, mappableType?: MappableType, inputRegex?: string, outputRegex?: string, mappingTypeId?: string, gameVersionId?: string, createdBy?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpEvent<PageDetailedMapping>>;
-    public getDetailedMappingsBySearchCriteria(latestOnly?: boolean, versionedMappableId?: string, releaseId?: string, mappableType?: MappableType, inputRegex?: string, outputRegex?: string, mappingTypeId?: string, gameVersionId?: string, createdBy?: string, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<any> {
+    public getDetailedMappingById(requestParameters: GetDetailedMappingByIdRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<DetailedMapping>;
+    public getDetailedMappingById(requestParameters: GetDetailedMappingByIdRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<DetailedMapping>>;
+    public getDetailedMappingById(requestParameters: GetDetailedMappingByIdRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<DetailedMapping>>;
+    public getDetailedMappingById(requestParameters: GetDetailedMappingByIdRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const id = requestParameters.id;
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling getDetailedMappingById.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        let httpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
+        if (httpHeaderAcceptSelected === undefined) {
+            // to determine the Accept header
+            const httpHeaderAccepts: string[] = [
+                'application/json'
+            ];
+            httpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        }
+        if (httpHeaderAcceptSelected !== undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+
+        let responseType: 'text' | 'json' = 'json';
+        if(httpHeaderAcceptSelected && httpHeaderAcceptSelected.startsWith('text')) {
+            responseType = 'text';
+        }
+
+        return this.httpClient.get<DetailedMapping>(`${this.configuration.basePath}/mappings/detailed/${encodeURIComponent(String(id))}`,
+            {
+                responseType: <any>responseType,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Gets all known mappings, and their metadata, and finds the ones that match the given parameters.
+     * @param requestParameters
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getDetailedMappingsBySearchCriteria(requestParameters: GetDetailedMappingsBySearchCriteriaRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<PageDetailedMapping>;
+    public getDetailedMappingsBySearchCriteria(requestParameters: GetDetailedMappingsBySearchCriteriaRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<PageDetailedMapping>>;
+    public getDetailedMappingsBySearchCriteria(requestParameters: GetDetailedMappingsBySearchCriteriaRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<PageDetailedMapping>>;
+    public getDetailedMappingsBySearchCriteria(requestParameters: GetDetailedMappingsBySearchCriteriaRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const latestOnly = requestParameters.latestOnly;
+        const versionedMappableId = requestParameters.versionedMappableId;
+        const releaseId = requestParameters.releaseId;
+        const mappableType = requestParameters.mappableType;
+        const inputRegex = requestParameters.inputRegex;
+        const outputRegex = requestParameters.outputRegex;
+        const mappingTypeId = requestParameters.mappingTypeId;
+        const gameVersionId = requestParameters.gameVersionId;
+        const createdBy = requestParameters.createdBy;
+        const parentClassId = requestParameters.parentClassId;
+        const parentMethodId = requestParameters.parentMethodId;
+        const page = requestParameters.page;
+        const size = requestParameters.size;
+        const sort = requestParameters.sort;
 
         let queryParameters = new HttpParams({encoder: this.encoder});
         if (latestOnly !== undefined && latestOnly !== null) {
@@ -216,6 +345,14 @@ export class MappingsService {
           queryParameters = this.addToHttpParams(queryParameters,
             <any>createdBy, 'createdBy');
         }
+        if (parentClassId !== undefined && parentClassId !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>parentClassId, 'parentClassId');
+        }
+        if (parentMethodId !== undefined && parentMethodId !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>parentMethodId, 'parentMethodId');
+        }
         if (page !== undefined && page !== null) {
           queryParameters = this.addToHttpParams(queryParameters,
             <any>page, 'page');
@@ -237,7 +374,6 @@ export class MappingsService {
         if (httpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
-                'text/event-stream',
                 'application/json'
             ];
             httpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
@@ -266,14 +402,15 @@ export class MappingsService {
 
     /**
      * Looks up a mapping using a given id.
-     * @param id The id of the mapping to look up.
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getMappingsById(id: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<Mapping>;
-    public getMappingsById(id: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<Mapping>>;
-    public getMappingsById(id: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<Mapping>>;
-    public getMappingsById(id: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+    public getMappingsById(requestParameters: GetMappingsByIdRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<Mapping>;
+    public getMappingsById(requestParameters: GetMappingsByIdRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<Mapping>>;
+    public getMappingsById(requestParameters: GetMappingsByIdRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<Mapping>>;
+    public getMappingsById(requestParameters: GetMappingsByIdRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const id = requestParameters.id;
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getMappingsById.');
         }
@@ -311,25 +448,28 @@ export class MappingsService {
 
     /**
      * Gets all known mappings and finds the ones that match the given parameters.
-     * @param latestOnly Indicates if only latest mappings for a given versioned mappable should be taken into account. Defaults to true if not supplied.
-     * @param versionedMappableId The id of the versioned mappable to filter on.
-     * @param releaseId The id of the release to filter on.
-     * @param mappableType The mappable type to filter on.
-     * @param inputRegex The regular expression to match the input of the mapping against.
-     * @param outputRegex The regular expression to match the output of the mapping against.
-     * @param mappingTypeId The id of the mapping type to filter on.
-     * @param gameVersionId The id of the game version to filter on.
-     * @param createdBy The id of the user who created a mapping to filter on.
-     * @param page Zero-based page index (0..N)
-     * @param size The size of the page to be returned
-     * @param sort Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getMappingsBySearchCriteria(latestOnly?: boolean, versionedMappableId?: string, releaseId?: string, mappableType?: MappableType, inputRegex?: string, outputRegex?: string, mappingTypeId?: string, gameVersionId?: string, createdBy?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<PageMapping>;
-    public getMappingsBySearchCriteria(latestOnly?: boolean, versionedMappableId?: string, releaseId?: string, mappableType?: MappableType, inputRegex?: string, outputRegex?: string, mappingTypeId?: string, gameVersionId?: string, createdBy?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpResponse<PageMapping>>;
-    public getMappingsBySearchCriteria(latestOnly?: boolean, versionedMappableId?: string, releaseId?: string, mappableType?: MappableType, inputRegex?: string, outputRegex?: string, mappingTypeId?: string, gameVersionId?: string, createdBy?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpEvent<PageMapping>>;
-    public getMappingsBySearchCriteria(latestOnly?: boolean, versionedMappableId?: string, releaseId?: string, mappableType?: MappableType, inputRegex?: string, outputRegex?: string, mappingTypeId?: string, gameVersionId?: string, createdBy?: string, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<any> {
+    public getMappingsBySearchCriteria(requestParameters: GetMappingsBySearchCriteriaRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<PageMapping>;
+    public getMappingsBySearchCriteria(requestParameters: GetMappingsBySearchCriteriaRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<PageMapping>>;
+    public getMappingsBySearchCriteria(requestParameters: GetMappingsBySearchCriteriaRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<PageMapping>>;
+    public getMappingsBySearchCriteria(requestParameters: GetMappingsBySearchCriteriaRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const latestOnly = requestParameters.latestOnly;
+        const versionedMappableId = requestParameters.versionedMappableId;
+        const releaseId = requestParameters.releaseId;
+        const mappableType = requestParameters.mappableType;
+        const inputRegex = requestParameters.inputRegex;
+        const outputRegex = requestParameters.outputRegex;
+        const mappingTypeId = requestParameters.mappingTypeId;
+        const gameVersionId = requestParameters.gameVersionId;
+        const createdBy = requestParameters.createdBy;
+        const parentClassId = requestParameters.parentClassId;
+        const parentMethodId = requestParameters.parentMethodId;
+        const page = requestParameters.page;
+        const size = requestParameters.size;
+        const sort = requestParameters.sort;
 
         let queryParameters = new HttpParams({encoder: this.encoder});
         if (latestOnly !== undefined && latestOnly !== null) {
@@ -368,6 +508,14 @@ export class MappingsService {
           queryParameters = this.addToHttpParams(queryParameters,
             <any>createdBy, 'createdBy');
         }
+        if (parentClassId !== undefined && parentClassId !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>parentClassId, 'parentClassId');
+        }
+        if (parentMethodId !== undefined && parentMethodId !== null) {
+          queryParameters = this.addToHttpParams(queryParameters,
+            <any>parentMethodId, 'parentMethodId');
+        }
         if (page !== undefined && page !== null) {
           queryParameters = this.addToHttpParams(queryParameters,
             <any>page, 'page');
@@ -389,7 +537,6 @@ export class MappingsService {
         if (httpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
-                'text/event-stream',
                 'application/json'
             ];
             httpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);

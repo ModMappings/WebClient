@@ -3,8 +3,6 @@
   overflow: auto;
 }
 
-.spinner-item {
-  display: grid;
-  place-items: center;
-  margin-top: 10px;
+mat-list-item {
+  cursor: pointer;
 }

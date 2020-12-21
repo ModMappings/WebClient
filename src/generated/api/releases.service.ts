@@ -24,6 +24,49 @@ import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables'
 import { Configuration }                                     from '../configuration';
 
 
+export interface CreateReleaseRequestParams {
+    gameVersion: string;
+    mappingType: string;
+    release?: Release;
+}
+
+export interface DeleteReleaseRequestParams {
+    /** The id of the release to delete. */
+    id: string;
+}
+
+export interface GetReleasesByIdRequestParams {
+    /** The id of the release to look up. */
+    id: string;
+}
+
+export interface GetReleasesBySearchCriteriaRequestParams {
+    /** The regular expression to match the name of the release against. */
+    name?: string;
+    /** The id of the game version to filter releases on. */
+    gameVersion?: string;
+    /** The id of the mapping type to filter releases on. */
+    mappingType?: string;
+    /** Determines if snapshot releases are supposed to be filtered out, leave the parameter out to not filter on snapshot state of releases. */
+    snapshot?: boolean;
+    /** The id of the mapping to filter releases on. */
+    mappingId?: string;
+    /** The id of the user who created the release to filter releases on. */
+    user?: string;
+    /** Zero-based page index (0..N) */
+    page?: number;
+    /** The size of the page to be returned */
+    size?: number;
+    /** Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+    sort?: Array<string>;
+}
+
+export interface UpdateReleaseRequestParams {
+    /** The id of the release to update. */
+    id: string;
+    release?: Release;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -89,22 +132,23 @@ export class ReleasesService {
     /**
      * Creates the release from the data in the request body.
      * This converts the data in the request body into a full release, and stores it in the database. The components of this release are populated from the latest available mappings in the given mapping type and game version. The name of the release can not already be in use. A user needs to be authorized to perform this request. A user needs to have the role \&#39;RELEASES_CREATE\&#39; to execute this action successfully.
-     * @param gameVersion 
-     * @param mappingType 
-     * @param release 
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createRelease(gameVersion: string, mappingType: string, release?: Release, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<Release>;
-    public createRelease(gameVersion: string, mappingType: string, release?: Release, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<Release>>;
-    public createRelease(gameVersion: string, mappingType: string, release?: Release, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<Release>>;
-    public createRelease(gameVersion: string, mappingType: string, release?: Release, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+    public createRelease(requestParameters: CreateReleaseRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<Release>;
+    public createRelease(requestParameters: CreateReleaseRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<Release>>;
+    public createRelease(requestParameters: CreateReleaseRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<Release>>;
+    public createRelease(requestParameters: CreateReleaseRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const gameVersion = requestParameters.gameVersion;
         if (gameVersion === null || gameVersion === undefined) {
             throw new Error('Required parameter gameVersion was null or undefined when calling createRelease.');
         }
+        const mappingType = requestParameters.mappingType;
         if (mappingType === null || mappingType === undefined) {
             throw new Error('Required parameter mappingType was null or undefined when calling createRelease.');
         }
+        const release = requestParameters.release;
 
         let headers = this.defaultHeaders;
 
@@ -158,14 +202,15 @@ export class ReleasesService {
     /**
      * Deletes the release with the given id.
      * This looks up the release with the given id from the database and deletes it. A user needs to be authorized to perform this request. A user needs to have the role \&#39;RELEASES_DELETE\&#39; to execute this action successfully.
-     * @param id The id of the release to delete.
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public deleteRelease(id: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<any>;
-    public deleteRelease(id: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<any>>;
-    public deleteRelease(id: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<any>>;
-    public deleteRelease(id: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+    public deleteRelease(requestParameters: DeleteReleaseRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<any>;
+    public deleteRelease(requestParameters: DeleteReleaseRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<any>>;
+    public deleteRelease(requestParameters: DeleteReleaseRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<any>>;
+    public deleteRelease(requestParameters: DeleteReleaseRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const id = requestParameters.id;
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling deleteRelease.');
         }
@@ -211,14 +256,15 @@ export class ReleasesService {
 
     /**
      * Looks up a release using a given id.
-     * @param id The id of the release to look up.
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getReleasesById(id: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<Release>;
-    public getReleasesById(id: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<Release>>;
-    public getReleasesById(id: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<Release>>;
-    public getReleasesById(id: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+    public getReleasesById(requestParameters: GetReleasesByIdRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<Release>;
+    public getReleasesById(requestParameters: GetReleasesByIdRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<Release>>;
+    public getReleasesById(requestParameters: GetReleasesByIdRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<Release>>;
+    public getReleasesById(requestParameters: GetReleasesByIdRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const id = requestParameters.id;
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getReleasesById.');
         }
@@ -256,22 +302,23 @@ export class ReleasesService {
 
     /**
      * Gets all known releases and finds the ones that match the given parameters.
-     * @param name The regular expression to match the name of the release against.
-     * @param gameVersion The id of the game version to filter releases on.
-     * @param mappingType The id of the mapping type to filter releases on.
-     * @param snapshot Determines if snapshot releases are supposed to be filtered out, leave the parameter out to not filter on snapshot state of releases.
-     * @param mappingId The id of the mapping to filter releases on.
-     * @param user The id of the user who created the release to filter releases on.
-     * @param page Zero-based page index (0..N)
-     * @param size The size of the page to be returned
-     * @param sort Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getReleasesBySearchCriteria(name?: string, gameVersion?: string, mappingType?: string, snapshot?: boolean, mappingId?: string, user?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<PageRelease>;
-    public getReleasesBySearchCriteria(name?: string, gameVersion?: string, mappingType?: string, snapshot?: boolean, mappingId?: string, user?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpResponse<PageRelease>>;
-    public getReleasesBySearchCriteria(name?: string, gameVersion?: string, mappingType?: string, snapshot?: boolean, mappingId?: string, user?: string, page?: number, size?: number, sort?: Array<string>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<HttpEvent<PageRelease>>;
-    public getReleasesBySearchCriteria(name?: string, gameVersion?: string, mappingType?: string, snapshot?: boolean, mappingId?: string, user?: string, page?: number, size?: number, sort?: Array<string>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'text/event-stream' | 'application/json'}): Observable<any> {
+    public getReleasesBySearchCriteria(requestParameters: GetReleasesBySearchCriteriaRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<PageRelease>;
+    public getReleasesBySearchCriteria(requestParameters: GetReleasesBySearchCriteriaRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<PageRelease>>;
+    public getReleasesBySearchCriteria(requestParameters: GetReleasesBySearchCriteriaRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<PageRelease>>;
+    public getReleasesBySearchCriteria(requestParameters: GetReleasesBySearchCriteriaRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const name = requestParameters.name;
+        const gameVersion = requestParameters.gameVersion;
+        const mappingType = requestParameters.mappingType;
+        const snapshot = requestParameters.snapshot;
+        const mappingId = requestParameters.mappingId;
+        const user = requestParameters.user;
+        const page = requestParameters.page;
+        const size = requestParameters.size;
+        const sort = requestParameters.sort;
 
         let queryParameters = new HttpParams({encoder: this.encoder});
         if (name !== undefined && name !== null) {
@@ -319,7 +366,6 @@ export class ReleasesService {
         if (httpHeaderAcceptSelected === undefined) {
             // to determine the Accept header
             const httpHeaderAccepts: string[] = [
-                'text/event-stream',
                 'application/json'
             ];
             httpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
@@ -349,18 +395,19 @@ export class ReleasesService {
     /**
      * Updates, but does not create, the release from the data in the request body.
      * This converts the data in the request body into a full release, then updates the release with the given id, and stores the updated release in the database. The new name of the release can not already be in use by a different release. A user needs to be authorized to perform this request. A user needs to have the role \&#39;RELEASE_UPDATE\&#39; to execute this action successfully.
-     * @param id The id of the release to update.
-     * @param release 
+     * @param requestParameters
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public updateRelease(id: string, release?: Release, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<Release>;
-    public updateRelease(id: string, release?: Release, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<Release>>;
-    public updateRelease(id: string, release?: Release, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<Release>>;
-    public updateRelease(id: string, release?: Release, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+    public updateRelease(requestParameters: UpdateReleaseRequestParams, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<Release>;
+    public updateRelease(requestParameters: UpdateReleaseRequestParams, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<Release>>;
+    public updateRelease(requestParameters: UpdateReleaseRequestParams, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<Release>>;
+    public updateRelease(requestParameters: UpdateReleaseRequestParams, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        const id = requestParameters.id;
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateRelease.');
         }
+        const release = requestParameters.release;
 
         let headers = this.defaultHeaders;
 
